@@ -1,0 +1,84 @@
+services:
+
+  classifiers-app:
+    container_name: classifiers-app
+    hostname: classifiers-app
+    image: riazmey/classifiers-app:latest
+    environment:
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
+      - DJANGO_DEBUG=${DJANGO_DEBUG}
+      - DJANGO_ALLOWED_HOSTS=${DJANGO_ALLOWED_HOSTS}
+      - DATABASE_DB=${DATABASE_DB}
+      - DATABASE_USER=${DATABASE_USER}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_HOST=${DATABASE_HOST}
+      - DATABASE_PORT=${DATABASE_PORT}
+      - WEB_PORT=${WEB_PORT}
+    networks:
+      default:
+        ipv4_address: ${NETWORK_IP_APP}
+    dns_search:
+      - .
+    ports:
+      - '${WEB_PORT}:${WEB_PORT}'
+    volumes:
+      - source: /data/classifiers-app/migrations
+        target: /app/classifiers/classifiers/migrations
+        read_only: false
+        type: bind
+        bind:
+          create_host_path: true
+    command: python /app/classifiers/manage.py runserver 0.0.0.0:${WEB_PORT}
+    healthcheck:
+      test: [ 'CMD-SHELL', 'curl --fail http://docker.ltlog.local:${WEB_PORT}/manage || exit 1' ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    depends_on:
+      - classifiers-psql
+
+  classifiers-psql:
+    container_name: classifiers-psql
+    hostname: classifiers-psql
+    image: riazmey/classifiers-psql:latest
+    shm_size: 128mb
+    environment:
+      - POSTGRES_DB=${DATABASE_DB}
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    networks:
+      default:
+        ipv4_address: ${NETWORK_IP_PSQL}
+    dns_search:
+      - .
+    ports:
+      - "${DATABASE_PORT}:${DATABASE_PORT}"
+    volumes:
+      - source: /data/classifiers-psql
+        target: /var/lib/postgresql/data
+        read_only: false
+        type: bind
+        bind:
+          create_host_path: true
+      - type: tmpfs
+        target: /var/run/postgresql
+        read_only: false
+    command: -p ${DATABASE_PORT}
+    healthcheck:
+      test: [ 'CMD-SHELL', 'pg_isready -h ${NETWORK_IP_PSQL} -p ${DATABASE_PORT} -U ${DATABASE_USER}' ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
+
+networks:
+
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${NETWORK_SUBNET}
