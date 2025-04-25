@@ -6,11 +6,23 @@ from .transport_order import TransportOrder
 
 
 class TransportOrderIDValue:
+    """Represents and validates transport order ID values.
+    
+    Supports serialization/deserialization of different data types
+    into a unified string format for database storage.
+    
+    Format: <type>;<value>
+    Supported types: str, float, int
+    """
 
     def __init__(self, value: str | float | int):
         if isinstance(value, str):
             if ';' in value:
+                if value.count(';') != 1:
+                    raise ValueError("Invalid format for string value. Expected exactly one ';'")
                 parts = value.split(';')
+                if parts[0] not in {'str', 'float', 'int'}:
+                    raise ValueError(f"Invalid type specifier: {parts[0]}")
                 self.type = parts[0]
                 self.value = parts[1]
             else:
@@ -31,6 +43,14 @@ class TransportOrderIDValue:
     def __repr__(self):
         return f'{self.value} ({self.type})'
 
+    def __eq__(self, other):
+        if isinstance(other, TransportOrderIDValue):
+            return self.type == other.type and self.value == other.value
+        return False
+
+    def __hash__(self):
+        return hash((self.type, self.value))
+
     def value_db(self) -> str:
         return f'{self.type};{self.value}'
 
@@ -48,29 +68,37 @@ class TransportOrderIDValue:
 
 class TransportOrderIDField(Field):
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, max_length=100, **kwargs):
+        self.max_length = max_length
         super().__init__(*args, **kwargs)
 
+    def deconstruct(self):
+        name, path, args, kwargs = super().deconstruct()
+        kwargs['max_length'] = self.max_length
+        return name, path, args, kwargs
+
     def db_type(self, connection):
-        return 'VARCHAR(100)'  # Тип данных в базе данных
+        return f'VARCHAR({self.max_length})'
 
     def to_python(self, value):
-        # Преобразуем значение из базы данных в Python-объект
         return TransportOrderIDValue(value)
 
     def get_prep_value(self, value):
-        # Преобразуем Python-объект в значение, которое можно сохранить в базе данных
         return TransportOrderIDValue(value).value_db()
 
 
 class TransportOrderID(models.Model):
 
     class Meta:
-        unique_together = ('market', 'order', 'order_id')
+        constraints = [
+            models.UniqueConstraint(
+                fields=['market', 'order', 'order_id'],
+                name='unique_order_per_market'
+            )
+        ]
         indexes = [
-            models.Index(fields=['market', 'order_id']),
-            models.Index(fields=['market', 'order']),
-            models.Index(fields=['order_id'])
+            models.Index(fields=['market', 'order_id'], name='market_order_id_idx'),
+            models.Index(fields=['order_id'], name='order_id_idx')
         ]
         verbose_name = 'ID транспортно-логистического заказа'
         verbose_name_plural = 'ID\'s транспортно-логистических заказов'
@@ -85,7 +113,7 @@ class TransportOrderID(models.Model):
     
     order = models.ForeignKey(
         TransportOrder,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         blank=False,
         verbose_name='Транспортно-логистический заказ'
     )
@@ -96,6 +124,7 @@ class TransportOrderID(models.Model):
     )
 
     order_code = models.CharField(
+        default='',
         blank=True,
         verbose_name='Код (человекочитаемый)'
     )
@@ -106,10 +135,10 @@ class TransportOrderID(models.Model):
         blank=True,
         verbose_name='ID транспортно-логистического заказа'
     )
-    
-    def save(self, *args, **kwargs):
-        self.repr = f'{self.order_id}: {self.order}'
-        super().save(*args, **kwargs)
+
+    @property
+    def repr(self):
+        return f'{self.order_id}: {self.order}'
 
     def __str__(self):
         return self.repr

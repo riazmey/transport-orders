@@ -15,7 +15,7 @@ class  TransportOrderCargo(models.Model):
 
     order = models.ForeignKey(
         TransportOrder,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         blank=False,
         verbose_name='Транспортно-логистический заказ'
     )
@@ -41,7 +41,7 @@ class  TransportOrderCargo(models.Model):
 
     volume = models.FloatField(
         default=0.00,
-        blank=False,
+        blank=True,
         verbose_name='Объем'
     )
 

@@ -38,7 +38,13 @@ def getenv(name: str, default: any) -> any:
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = getenv('DJANGO_SECRET_KEY', get_random_secret_key())
+secret_key_env = getenv('DJANGO_SECRET_KEY', '')
+if secret_key_env:
+    SECRET_KEY = secret_key_env
+    use_vars_env = True
+else:
+    SECRET_KEY = get_random_secret_key()
+    use_vars_env = False
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = getenv('DJANGO_DEBUG', True)
@@ -47,9 +53,7 @@ ALLOWED_HOSTS = getenv('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-DATABASE_DB = getenv('DATABASE_DB', '')
-
-if DATABASE_DB: 
+if use_vars_env: 
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -65,6 +69,20 @@ else:
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
+
+# Connection settings for web services
+if use_vars_env:
+    WEB_SERVICES = {
+        "classifiers": {
+            "URL": getenv('WS_CLASSIFIERS_URL', 'http://127.0.0.1:8000'),
+        }
+    }
+else:
+    WEB_SERVICES = {
+        "classifiers": {
+            "URL": "http://127.0.0.1:8000",
         }
     }
 
@@ -110,18 +128,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'core.wsgi.application'
-
-
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

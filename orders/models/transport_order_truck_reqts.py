@@ -3,19 +3,19 @@ from django.db import models
 from .transport_order import TransportOrder
 
 
-class  TransportOrderTruck(models.Model):
+class  TransportOrderTruckReqts(models.Model):
     
     class Meta:
         indexes = [
             models.Index(fields=['order']),
         ]
         ordering = ['code_str']
-        verbose_name = 'Транспорт заказа'
-        verbose_name_plural = 'Грузы транспортно-логистических заказов'
+        verbose_name = 'Требования к транспорту заказа'
+        verbose_name_plural = 'Требования к транспорту заказа'
 
-    order = models.ForeignKey(
+    order = models.OneToOneField(
         TransportOrder,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         blank=False,
         verbose_name='Транспортно-логистический заказ'
     )
