@@ -3,7 +3,7 @@ from django.db import models
 from .transport_order import TransportOrder
 
 
-class  TransportOrderTruckReqts(models.Model):
+class TransportOrderTruckReqts(models.Model):
     
     class Meta:
         indexes = [
@@ -15,54 +15,61 @@ class  TransportOrderTruckReqts(models.Model):
 
     order = models.OneToOneField(
         TransportOrder,
-        on_delete=models.CASCADE,
-        blank=False,
-        verbose_name='Транспортно-логистический заказ'
-    )
-
-    name = models.CharField(
-        max_length=150,
-        default='',
-        blank=False,
-        verbose_name='Наименование'
+        on_delete = models.CASCADE,
+        blank = False,
+        verbose_name = 'Транспортно-логистический заказ'
     )
 
     weight = models.FloatField(
-        default=0.00,
-        blank=False,
-        verbose_name='Масса'
+        default = 0.00,
+        blank = False,
+        verbose_name = 'Масса'
     )
 
     weight_unit = models.CharField(
-        default='',
-        blank=True,
-        verbose_name='Единица измерения массы'
+        default = '',
+        blank = True,
+        verbose_name = 'Единица измерения массы'
     )
 
     volume = models.FloatField(
-        default=0.00,
-        blank=False,
-        verbose_name='Объем'
+        default = 0.00,
+        blank = False,
+        verbose_name = 'Объем'
     )
 
     volume_unit = models.CharField(
-        default='',
-        blank=True,
-        verbose_name='Единица измерения объема'
+        default = '',
+        blank = True,
+        verbose_name = 'Единица измерения объема'
+    )
+
+    refrigeration = models.BooleanField(
+        default = False,
+        blank = False,
+        verbose_name = 'Охлаждение'
+    )
+
+    temperature = models.SmallIntegerField(
+        default = 0,
+        min_value = -273,
+        max_value = 35,
+        blank = True,
+        verbose_name = 'Температура'
     )
 
     comment = models.CharField(
-        max_length=1024,
-        default='',
-        blank=True,
-        verbose_name='Комментарий'
+        max_length = 1024,
+        default = '',
+        blank = True,
+        verbose_name = 'Комментарий'
     )
 
     repr = models.CharField(
-        max_length=255,
-        default='',
-        blank=True,
-        verbose_name='Транспортно-логистический заказ'
+        max_length = 255,
+        default = '',
+        blank = True,
+        verbose_name = 'Транспортно-логистический заказ'
     )
 
     def save(self, *args, **kwargs):

@@ -1,5 +1,5 @@
 
-from 
+from .classifiers import Classifiers
 
 class Atrucks:
 

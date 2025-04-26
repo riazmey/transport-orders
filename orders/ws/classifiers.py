@@ -2,7 +2,7 @@
 import json
 import requests
 from django.conf import settings
-from typing import Any, Union, Dict, Tuple
+from typing import Any, Dict, Tuple
 
 
 class Classifiers:
@@ -49,4 +49,4 @@ class Classifiers:
         except requests.RequestException as e:
             return str(e), False
         except json.JSONDecodeError as e:
-            return f"Ошибка при парсинге JSON: {e}", False
+            return f"Error parsing JSON: {e}", False

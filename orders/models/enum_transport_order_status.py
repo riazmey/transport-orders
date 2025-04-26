@@ -12,18 +12,18 @@ class EnumTransportOrderStatus(models.Model):
         verbose_name_plural = 'Статусы транспортно-логистических заказов'
 
     code_str = models.CharField(
-        max_length=50,
-        default='',
-        blank=False,
-        unique=True,
-        verbose_name='Код (строковый)'
+        max_length = 50,
+        default = '',
+        blank = False,
+        unique = True,
+        verbose_name = 'Код (строковый)'
     )
 
     repr = models.CharField(
-        max_length=255,
-        default='',
-        blank=False,
-        verbose_name='Статус транспортно-логистического заказа'
+        max_length = 255,
+        default = '',
+        blank = False,
+        verbose_name = 'Статус транспортно-логистического заказа'
     )
 
     def __str__(self):

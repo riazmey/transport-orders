@@ -106,34 +106,34 @@ class TransportOrderID(models.Model):
 
     market = models.ForeignKey(
         Marketplace,
-        on_delete=models.PROTECT,
-        blank=False,
-        verbose_name='Площадка'
+        on_delete = models.PROTECT,
+        blank = False,
+        verbose_name = 'Площадка'
     )
     
     order = models.ForeignKey(
         TransportOrder,
-        on_delete=models.CASCADE,
-        blank=False,
-        verbose_name='Транспортно-логистический заказ'
+        on_delete = models.CASCADE,
+        blank = False,
+        verbose_name = 'Транспортно-логистический заказ'
     )
 
     order_id = TransportOrderIDField(
-        blank=False,
-        verbose_name='Идентификатор'
+        blank = False,
+        verbose_name = 'Идентификатор'
     )
 
     order_code = models.CharField(
-        default='',
-        blank=True,
-        verbose_name='Код (человекочитаемый)'
+        default = '',
+        blank = True,
+        verbose_name = 'Код (человекочитаемый)'
     )
 
     repr = models.CharField(
-        max_length=255,
-        default='',
-        blank=True,
-        verbose_name='ID транспортно-логистического заказа'
+        max_length = 255,
+        default = '',
+        blank = True,
+        verbose_name = 'ID транспортно-логистического заказа'
     )
 
     @property

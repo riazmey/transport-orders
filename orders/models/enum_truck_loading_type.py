@@ -1,15 +1,15 @@
 
 from django.db import models
 
-class EnumMarketplaceType(models.Model):
+class EnumTruckLoadingType(models.Model):
 
     class Meta:
         indexes = [
             models.Index(fields=['code_str'])
         ]
         ordering = ['name']
-        verbose_name = 'API площадки'
-        verbose_name_plural = 'API площадок'
+        verbose_name = 'Тип загрузки грузовика'
+        verbose_name_plural = 'Типы загрузок грузовиков'
 
     code_str = models.CharField(
         max_length = 50,
@@ -23,7 +23,7 @@ class EnumMarketplaceType(models.Model):
         max_length = 255,
         default = '',
         blank = False,
-        verbose_name = 'API площадки'
+        verbose_name = 'Тип загрузки грузовика'
     )
 
     def __str__(self):

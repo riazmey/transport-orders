@@ -3,7 +3,7 @@ from django.db import models
 from .transport_order import TransportOrder
 
 
-class  TransportOrderCargo(models.Model):
+class TransportOrderCargo(models.Model):
     
     class Meta:
         indexes = [
@@ -15,54 +15,54 @@ class  TransportOrderCargo(models.Model):
 
     order = models.ForeignKey(
         TransportOrder,
-        on_delete=models.CASCADE,
-        blank=False,
-        verbose_name='Транспортно-логистический заказ'
+        on_delete = models.CASCADE,
+        blank = False,
+        verbose_name = 'Транспортно-логистический заказ'
     )
 
     name = models.CharField(
-        max_length=150,
-        default='',
-        blank=False,
-        verbose_name='Наименование'
+        max_length = 150,
+        default = '',
+        blank = False,
+        verbose_name = 'Наименование'
     )
 
     weight = models.FloatField(
-        default=0.00,
-        blank=False,
-        verbose_name='Масса'
+        default = 0.00,
+        blank = False,
+        verbose_name = 'Масса'
     )
 
     weight_unit = models.CharField(
-        default='',
-        blank=True,
-        verbose_name='Единица измерения массы'
+        default = '',
+        blank = True,
+        verbose_name = 'Единица измерения массы'
     )
 
     volume = models.FloatField(
-        default=0.00,
-        blank=True,
-        verbose_name='Объем'
+        default = 0.00,
+        blank = True,
+        verbose_name = 'Объем'
     )
 
     volume_unit = models.CharField(
-        default='',
-        blank=True,
-        verbose_name='Единица измерения объема'
+        default = '',
+        blank = True,
+        verbose_name = 'Единица измерения объема'
     )
 
     comment = models.CharField(
-        max_length=1024,
-        default='',
-        blank=True,
-        verbose_name='Комментарий'
+        max_length = 1024,
+        default = '',
+        blank = True,
+        verbose_name = 'Комментарий'
     )
 
     repr = models.CharField(
-        max_length=255,
-        default='',
-        blank=True,
-        verbose_name='Транспортно-логистический заказ'
+        max_length = 255,
+        default = '',
+        blank = True,
+        verbose_name = 'Транспортно-логистический заказ'
     )
 
     def save(self, *args, **kwargs):

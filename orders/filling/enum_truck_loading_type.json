@@ -1,0 +1,5 @@
+[
+	{"code_str": "backside", "repr": "Задняя"},
+	{"code_str": "side", "repr": "Боковая"},
+	{"code_str": "top", "repr": "Верхняя"}
+]

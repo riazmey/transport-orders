@@ -10,38 +10,38 @@ class Marketplace(models.Model):
     
     type = models.ForeignKey(
         EnumMarketplaceType,
-        on_delete=models.PROTECT,
-        db_index=True,
-        blank=False,
-        verbose_name='Тип площадки'
+        on_delete = models.PROTECT,
+        db_index = True,
+        blank = False,
+        verbose_name = 'Тип площадки'
     )
 
     url = models.URLField(
-        max_length=255,
-        default='',
-        blank=False,
-        verbose_name='Адрес (URL)'
+        max_length = 255,
+        default = '',
+        blank = False,
+        verbose_name = 'Адрес (URL)'
     )
 
     login = models.CharField(
-        max_length=100,
-        default='',
-        blank=False,
-        verbose_name='Логин'
+        max_length = 100,
+        default = '',
+        blank = False,
+        verbose_name = 'Логин'
     )
 
     password = models.CharField(
-        max_length=128,
-        default='',
-        blank=False,
-        verbose_name='Пароль'
+        max_length = 128,
+        default = '',
+        blank = False,
+        verbose_name = 'Пароль'
     )
 
     repr = models.CharField(
-        max_length=255,
-        default='',
-        blank=True,
-        verbose_name='Площадка'
+        max_length = 255,
+        default = '',
+        blank = True,
+        verbose_name = 'Площадка'
     )
 
     def save(self, *args, **kwargs):
