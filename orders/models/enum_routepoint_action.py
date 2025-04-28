@@ -7,7 +7,7 @@ class EnumRoutepointAction(models.Model):
         indexes = [
             models.Index(fields=['code_str'])
         ]
-        ordering = ['name']
+        ordering = ['code_str']
         verbose_name = 'Действие в точке маршрута'
         verbose_name_plural = 'Действие в точках маршрутов'
 

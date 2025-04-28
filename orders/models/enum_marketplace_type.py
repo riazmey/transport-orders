@@ -7,9 +7,9 @@ class EnumMarketplaceType(models.Model):
         indexes = [
             models.Index(fields=['code_str'])
         ]
-        ordering = ['name']
-        verbose_name = 'API площадки'
-        verbose_name_plural = 'API площадок'
+        ordering = ['code_str']
+        verbose_name = 'Тип площадки'
+        verbose_name_plural = 'Типы площадок'
 
     code_str = models.CharField(
         max_length = 50,
@@ -23,7 +23,7 @@ class EnumMarketplaceType(models.Model):
         max_length = 255,
         default = '',
         blank = False,
-        verbose_name = 'API площадки'
+        verbose_name = 'Тип площадки'
     )
 
     def __str__(self):

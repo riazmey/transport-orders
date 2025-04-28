@@ -8,8 +8,8 @@ class EnumTransportOrderStatus(models.Model):
             models.Index(fields=['code_str'])
         ]
         ordering = ['code_str']
-        verbose_name = 'Статус транспортно-логистического заказа'
-        verbose_name_plural = 'Статусы транспортно-логистических заказов'
+        verbose_name = 'Статус заказа'
+        verbose_name_plural = 'Статусы заказов'
 
     code_str = models.CharField(
         max_length = 50,
@@ -23,7 +23,7 @@ class EnumTransportOrderStatus(models.Model):
         max_length = 255,
         default = '',
         blank = False,
-        verbose_name = 'Статус транспортно-логистического заказа'
+        verbose_name = 'Статус заказа'
     )
 
     def __str__(self):

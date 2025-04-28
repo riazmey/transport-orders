@@ -1,5 +1,8 @@
 
 from django.db import models
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+
 from .marketplace import Marketplace
 from .counterparty import Counterparty
 from .enum_transport_order_status import EnumTransportOrderStatus
@@ -11,9 +14,9 @@ class TransportOrder(models.Model):
         indexes = [
             models.Index(fields=['status']),
         ]
-        ordering = ['code_str']
-        verbose_name = 'Транспортно-логистический заказ'
-        verbose_name_plural = 'Транспортно-логистические заказы'
+        ordering = ['market']
+        verbose_name = 'Заказ'
+        verbose_name_plural = 'Заказы'
 
     market = models.ForeignKey(
         Marketplace,
@@ -69,13 +72,8 @@ class TransportOrder(models.Model):
         max_length = 255,
         default = '',
         blank = True,
-        verbose_name = 'Транспортно-логистический заказ'
+        verbose_name = 'Заказ'
     )
-
-    def save(self, *args, **kwargs):
-        if self.repr != self.name:
-            self.repr = self.name
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.repr
@@ -83,3 +81,8 @@ class TransportOrder(models.Model):
     def __repr__(self):
         return self.repr
 
+@receiver(pre_save, sender=TransportOrder)
+def update_repr(sender: TransportOrder, **kwargs):
+    new_repr = f'Заказ №{sender.id}'
+    if sender.repr != new_repr:
+        sender.repr = new_repr

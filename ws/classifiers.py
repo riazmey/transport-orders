@@ -5,7 +5,7 @@ from django.conf import settings
 from typing import Any, Dict, Tuple
 
 
-class Classifiers:
+class WSClassifiers:
     class URNs:
         currency = '/api/v1/currency'
         unit = '/api/v1/unit'
@@ -23,8 +23,8 @@ class Classifiers:
     def get_currency(self, params: Dict = None) -> Tuple[Any, bool]:
         return self._request(requests.get, self.URNs.currency, params)
 
-    def get_unit(self, params: Dict = None) -> Tuple[Any, bool]:
-        return self._request(requests.get, self.URNs.unit, params)
+    def get_unit_by_code_str(self, code_str: str) -> Tuple[Any, bool]:
+        return self._request(requests.get, self.URNs.unit, {'code_str': code_str})
 
     def get_units(self, params: Dict = None) -> Tuple[Any, bool]:
         return self._request(requests.get, self.URNs.units, params)

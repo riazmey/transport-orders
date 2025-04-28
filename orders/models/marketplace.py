@@ -1,13 +1,21 @@
 
+import importlib
+from django.db.models.signals import pre_save
 from django.db.models.signals import post_init
 from django.dispatch import receiver
-from django.db import transaction
 from django.db import models
+
 from .enum_marketplace_type import EnumMarketplaceType
+from ws import WSMarketplaceBase
 
 
 class Marketplace(models.Model):
     
+    class Meta:
+        verbose_name = 'Площадка'
+        verbose_name_plural = 'Площадки'
+        ordering = ['type']
+
     type = models.ForeignKey(
         EnumMarketplaceType,
         on_delete = models.PROTECT,
@@ -17,7 +25,6 @@ class Marketplace(models.Model):
     )
 
     url = models.URLField(
-        max_length = 255,
         default = '',
         blank = False,
         verbose_name = 'Адрес (URL)'
@@ -44,55 +51,30 @@ class Marketplace(models.Model):
         verbose_name = 'Площадка'
     )
 
-    def save(self, *args, **kwargs):
-        self.repr = f'{self.type} ({self.organization})'
-        super().save(*args, **kwargs)
-
     def __str__(self):
         return self.repr
 
     def __repr__(self):
         return self.repr
 
-    class Meta:
-        verbose_name = 'Площадка'
-        verbose_name_plural = 'Площадки'
-        ordering = ['type', 'organization']
-
+@receiver(pre_save, sender=Marketplace)
+def update_repr(sender: Marketplace , **kwargs):
+    marketplace_type = EnumMarketplaceType.objects.get(id=sender.type)
+    new_repr = f'{marketplace_type.repr} ({sender.url})'
+    if sender.repr != new_repr:
+        sender.repr = new_repr
 
 @receiver(post_init, sender=Marketplace)
-def initialize_api(sender, instance, **kwargs):
-    if instance.id:
-        try:
-            ClassMixIn = globals().get(instance.type.name)
-            if ClassMixIn is None:
-                raise ValueError(f"Класс для типа {instance.type.name} не найден")
-            MetaClass = type(f'API{instance.type.name}', (ClassMixIn, BaseAPI), {})
-            instance.api = MetaClass(instance)
-        except Exception as e:
-            print(f"Ошибка при инициализации API: {e}")
-            instance.api = None
-    else:
-        instance.api = None
-
-
-class BaseAPI:
-
-    def __init__(self, market: Marketplace):
-        self.market = market
-        self.url = market.url
-        self.login = market.login
-        self.password = market.password
-
-    @transaction.atomic
-    def order_import(self, **kwargs) -> (list[dict], bool):
-        result = []
-        data, success = self.order_get(**kwargs)
-        if success:
-            for order_data in data:
-                result += self._order_import(**order_data)
-        return result, success
-
-    def _order_import(self, **kwargs) -> list[dict]:
-        result = []
-        return result
+def initialize_api(sender: Marketplace, **kwargs):
+    try:
+        marketplace_type = EnumMarketplaceType.objects.get(id=sender.type)
+        name_mixin_class = f'WSMarketplace{marketplace_type.name.title()}'
+        ClassMixIn = getattr(importlib.import_module(f'ws.{name_mixin_class}'), name_mixin_class)
+        #ClassMixIn = globals().get(name_mixin_class)
+        if ClassMixIn is None:
+            raise ValueError(f'A MixIn class with name \'{name_mixin_class}\' for the type marketplace \'{marketplace_type.name}\' not found')
+        MetaClass = type(name_mixin_class, (ClassMixIn, WSMarketplaceBase), {})
+        sender.api = MetaClass(sender)
+    except Exception as e:
+        print(f"Error initializing the MixIn class: {e}")
+        sender.api = None

@@ -1,18 +1,28 @@
 
 from django.db import models
-from django.utils.timezone import now
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+
 from .enum_routepoint_action import EnumRoutepointAction
+from .transport_order import TransportOrder
 
 
 class TransportOrderRoutepoint(models.Model):
 
     class Meta:
         indexes = [
-            models.Index(fields=['code_str'])
+            models.Index(fields=['order'])
         ]
-        ordering = ['code_str']
-        verbose_name = 'Точка маршрута транспортно-логистического заказа'
-        verbose_name_plural = 'Точки маршрутов транспортно-логистических заказов'
+        ordering = ['order', 'date']
+        verbose_name = 'Точка маршрута заказа'
+        verbose_name_plural = 'Точки маршрутов заказов'
+
+    order = models.ForeignKey(
+        TransportOrder,
+        on_delete = models.CASCADE,
+        blank = False,
+        verbose_name = 'Заказ'
+    )
 
     action = models.ForeignKey(
         EnumRoutepointAction,
@@ -22,8 +32,7 @@ class TransportOrderRoutepoint(models.Model):
     )
 
     date = models.DateTimeField(
-        default = now,
-        auto_now_add = True,
+        #auto_now_add = True,
         blank = False,
         verbose_name = 'Дата'
     )
@@ -33,13 +42,6 @@ class TransportOrderRoutepoint(models.Model):
         default = '',
         blank = False,
         verbose_name = 'Адрес'
-    )
-
-    counterparty = models.CharField(
-        max_length = 255,
-        default = '',
-        blank = True,
-        verbose_name = 'Контрагент'
     )
 
     counterparty = models.CharField(
@@ -68,4 +70,11 @@ class TransportOrderRoutepoint(models.Model):
 
     def __repr__(self):
         return self.repr
+
+@receiver(pre_save, sender=TransportOrderRoutepoint)
+def update_repr(sender: TransportOrderRoutepoint , **kwargs):
+    order = TransportOrder.objects.get(id=sender.order)
+    new_repr = f'Точка маршрута {order.repr}: {sender.address}'
+    if sender.repr != new_repr:
+        sender.repr = new_repr
 

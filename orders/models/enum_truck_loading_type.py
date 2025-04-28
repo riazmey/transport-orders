@@ -7,7 +7,7 @@ class EnumTruckLoadingType(models.Model):
         indexes = [
             models.Index(fields=['code_str'])
         ]
-        ordering = ['name']
+        ordering = ['code_str']
         verbose_name = 'Тип загрузки грузовика'
         verbose_name_plural = 'Типы загрузок грузовиков'
 

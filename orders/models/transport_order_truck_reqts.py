@@ -1,7 +1,21 @@
 
 from django.db import models
-from .transport_order import TransportOrder
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+from django.core.exceptions import ValidationError
 
+from .transport_order import TransportOrder
+from ws import WSClassifiers
+
+
+def validate_temperature(value):
+    min_value = -273
+    max_value = 35
+    if value > 35:
+        raise ValidationError(f'The temperature must not be set above {max_value} ℃')
+    if value < min_value:
+        raise ValidationError(f'The temperature must not be set below {min_value} ℃')
+    return value
 
 class TransportOrderTruckReqts(models.Model):
     
@@ -9,7 +23,7 @@ class TransportOrderTruckReqts(models.Model):
         indexes = [
             models.Index(fields=['order']),
         ]
-        ordering = ['code_str']
+        ordering = ['order']
         verbose_name = 'Требования к транспорту заказа'
         verbose_name_plural = 'Требования к транспорту заказа'
 
@@ -17,24 +31,28 @@ class TransportOrderTruckReqts(models.Model):
         TransportOrder,
         on_delete = models.CASCADE,
         blank = False,
-        verbose_name = 'Транспортно-логистический заказ'
+        verbose_name = 'Заказ'
     )
 
-    weight = models.FloatField(
-        default = 0.00,
+    weight = models.DecimalField(
+        default = 0.000,
+        max_digits = 15,
+        decimal_places = 3,
         blank = False,
         verbose_name = 'Масса'
     )
 
     weight_unit = models.CharField(
         default = '',
-        blank = True,
+        blank = False,
         verbose_name = 'Единица измерения массы'
     )
 
-    volume = models.FloatField(
+    volume = models.DecimalField(
         default = 0.00,
-        blank = False,
+        max_digits = 10,
+        decimal_places = 2,
+        blank = True,
         verbose_name = 'Объем'
     )
 
@@ -52,8 +70,7 @@ class TransportOrderTruckReqts(models.Model):
 
     temperature = models.SmallIntegerField(
         default = 0,
-        min_value = -273,
-        max_value = 35,
+        validators = [validate_temperature],
         blank = True,
         verbose_name = 'Температура'
     )
@@ -69,16 +86,37 @@ class TransportOrderTruckReqts(models.Model):
         max_length = 255,
         default = '',
         blank = True,
-        verbose_name = 'Транспортно-логистический заказ'
+        verbose_name = 'Заказ'
     )
-
-    def save(self, *args, **kwargs):
-        if self.repr != self.name:
-            self.repr = self.name
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.repr
 
     def __repr__(self):
         return self.repr
+
+@receiver(pre_save, sender=TransportOrderTruckReqts)
+def update_repr(sender: TransportOrderTruckReqts, **kwargs):
+    repr_weight = f'{sender.weight} {sender.weight_unit}'
+    repr_volume = ''
+
+    weight_unit, success = WSClassifiers.get_unit_by_code_str(code_str=sender.weight_unit)
+    if success:
+        repr_weight = f'{sender.weight} {weight_unit}'
+    
+    if sender.volume_unit:
+        volume_unit, success = WSClassifiers.get_unit_by_code_str(code_str=sender.volume_unit)
+        if success:
+            repr_volume = f'{sender.volume} {volume_unit}'
+        else:
+            repr_volume = f'{sender.volume} {sender.volume_unit}'
+    
+    new_rep = f'{repr_weight} {repr_volume}'.rstrip()
+
+    if sender.repr != new_rep:
+        sender.repr = new_rep
+
+@receiver(pre_save, sender=TransportOrderTruckReqts)
+def clear_temperature(sender: TransportOrderTruckReqts, **kwargs):
+    if not sender.refrigeration:
+        sender.temperature = 0

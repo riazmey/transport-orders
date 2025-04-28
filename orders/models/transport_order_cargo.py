@@ -1,5 +1,8 @@
 
 from django.db import models
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+
 from .transport_order import TransportOrder
 
 
@@ -9,15 +12,15 @@ class TransportOrderCargo(models.Model):
         indexes = [
             models.Index(fields=['order']),
         ]
-        ordering = ['code_str']
-        verbose_name = 'Груз транспортно-логистического заказа'
-        verbose_name_plural = 'Грузы транспортно-логистических заказов'
+        ordering = ['order', 'name']
+        verbose_name = 'Груз заказа'
+        verbose_name_plural = 'Грузы заказов'
 
     order = models.ForeignKey(
         TransportOrder,
         on_delete = models.CASCADE,
         blank = False,
-        verbose_name = 'Транспортно-логистический заказ'
+        verbose_name = 'Заказ'
     )
 
     name = models.CharField(
@@ -62,16 +65,18 @@ class TransportOrderCargo(models.Model):
         max_length = 255,
         default = '',
         blank = True,
-        verbose_name = 'Транспортно-логистический заказ'
+        verbose_name = 'Груз заказа'
     )
-
-    def save(self, *args, **kwargs):
-        if self.repr != self.name:
-            self.repr = self.name
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.repr
 
     def __repr__(self):
         return self.repr
+
+@receiver(pre_save, sender=TransportOrderCargo)
+def update_repr(sender: TransportOrderCargo , **kwargs):
+    order = TransportOrder.objects.get(id=sender.order)
+    new_repr = f'{order.repr}: {sender.name}'
+    if sender.repr != new_repr:
+        sender.repr = new_repr

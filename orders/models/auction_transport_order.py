@@ -5,7 +5,7 @@ from .transport_order import TransportOrder
 
 
 class AuctionTransportOrder(models.Model):
-    
+
     class Meta:
         indexes = [
             models.Index(fields=['code_dec']),

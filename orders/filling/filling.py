@@ -12,7 +12,7 @@ from orders.models import EnumTransportOrderStatus
 @transaction.atomic
 def filling_enum_marketplace_type():
     print('Filling enumerate Marketplace types:')
-    path_file = f'{os.getcwd()}/classifiers/filling/enum_marketplace_type.json'
+    path_file = f'{os.getcwd()}/orders/filling/enum_marketplace_type.json'
     with open(path_file, 'r') as file:
         json_data = json.load(file)
         for item_data in json_data:
@@ -33,7 +33,7 @@ def filling_enum_marketplace_type():
 @transaction.atomic
 def filling_enum_routepoint_action():
     print('Filling enumerate routerpoints actions:')
-    path_file = f'{os.getcwd()}/classifiers/filling/enum_routepoint_action.json'
+    path_file = f'{os.getcwd()}/orders/filling/enum_routepoint_action.json'
     with open(path_file, 'r') as file:
         json_data = json.load(file)
         for item_data in json_data:
@@ -54,7 +54,7 @@ def filling_enum_routepoint_action():
 @transaction.atomic
 def filling_enum_truck_loading_type():
     print('Filling enumerate Truck loading types:')
-    path_file = f'{os.getcwd()}/classifiers/filling/enum_truck_loading_type.json'
+    path_file = f'{os.getcwd()}/orders/filling/enum_truck_loading_type.json'
     with open(path_file, 'r') as file:
         json_data = json.load(file)
         for item_data in json_data:
@@ -75,7 +75,7 @@ def filling_enum_truck_loading_type():
 @transaction.atomic
 def filling_enum_transport_order_status():
     print('Filling enumerate Transport order statuses:')
-    path_file = f'{os.getcwd()}/classifiers/filling/enum_transport_order_status.json'
+    path_file = f'{os.getcwd()}/orders/filling/enum_transport_order_status.json'
     with open(path_file, 'r') as file:
         json_data = json.load(file)
         for item_data in json_data:

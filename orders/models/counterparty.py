@@ -1,5 +1,7 @@
 
 from django.db import models
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 
 
 class Counterparty(models.Model):
@@ -42,7 +44,7 @@ class Counterparty(models.Model):
     kpp = models.CharField(
         max_length=9,
         default="",
-        blank=False,
+        blank=True,
         verbose_name="КПП"
     )
     
@@ -52,10 +54,6 @@ class Counterparty(models.Model):
         blank=True,
         verbose_name="Контрагент"
     )
-
-    def clean(self):
-        super().clean()
-        self.repr = f"{self.name} ({self.inn}/{self.kpp})"
 
     def __str__(self):
         return self.repr
@@ -67,3 +65,9 @@ class Counterparty(models.Model):
         if isinstance(value, str):
             return self.name == value
         return super().__eq__(value)
+
+@receiver(pre_save, sender=Counterparty)
+def update_repr(sender: Counterparty , **kwargs):
+    new_repr = f"{sender.name} ({sender.inn}/{sender.kpp})"
+    if sender.repr != new_repr:
+        sender.repr = new_repr

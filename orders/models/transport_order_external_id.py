@@ -1,12 +1,15 @@
 
-from django.db.models import Field
 from django.db import models
+from django.db.models import CharField
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+
 from .marketplace import Marketplace
 from .transport_order import TransportOrder
 
 
-class TransportOrderIDValue:
-    """Represents and validates transport order ID values.
+class TransportOrderExternalIDValue:
+    """Represents and validates transport order external ID values.
     
     Supports serialization/deserialization of different data types
     into a unified string format for database storage.
@@ -35,7 +38,7 @@ class TransportOrderIDValue:
             self.type = 'int'
             self.value = str(value)
         else:
-            raise ValueError("Unsupported type for TransportOrderIDValue")
+            raise ValueError("Unsupported type for TransportOrderExternalIDValue")
     
     def __str__(self):
         return self.value
@@ -44,7 +47,7 @@ class TransportOrderIDValue:
         return f'{self.value} ({self.type})'
 
     def __eq__(self, other):
-        if isinstance(other, TransportOrderIDValue):
+        if isinstance(other, TransportOrderExternalIDValue):
             return self.type == other.type and self.value == other.value
         return False
 
@@ -63,14 +66,14 @@ class TransportOrderIDValue:
             case 'int':
                 return int(self.value)
             case _:
-                raise ValueError(f"Unsupported type {self.type} for TransportOrderIDValue!")
+                raise ValueError(f"Unsupported type {self.type} for TransportOrderExternalIDValue!")
 
 
-class TransportOrderIDField(Field):
+class TransportOrderExternalIDField(CharField):
 
-    def __init__(self, *args, max_length=100, **kwargs):
-        self.max_length = max_length
+    def __init__(self, max_length=100, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.max_length = max_length
 
     def deconstruct(self):
         name, path, args, kwargs = super().deconstruct()
@@ -81,28 +84,28 @@ class TransportOrderIDField(Field):
         return f'VARCHAR({self.max_length})'
 
     def to_python(self, value):
-        return TransportOrderIDValue(value)
+        return TransportOrderExternalIDValue(value)
 
     def get_prep_value(self, value):
-        return TransportOrderIDValue(value).value_db()
+        return TransportOrderExternalIDValue(value).value_db()
 
 
-class TransportOrderID(models.Model):
+class TransportOrderExternalID(models.Model):
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['market', 'order', 'order_id'],
+                fields=['market', 'order', 'external_id'],
                 name='unique_order_per_market'
             )
         ]
         indexes = [
-            models.Index(fields=['market', 'order_id'], name='market_order_id_idx'),
+            models.Index(fields=['market', 'external_id'], name='market_order_id_idx'),
             models.Index(fields=['order_id'], name='order_id_idx')
         ]
-        verbose_name = 'ID транспортно-логистического заказа'
-        verbose_name_plural = 'ID\'s транспортно-логистических заказов'
-        ordering = ['order', 'market', 'order_code', 'object_id']
+        ordering = ['order', 'market', 'external_code', 'external_id']
+        verbose_name = 'Идентификатор заказа'
+        verbose_name_plural = 'Идентификаторы заказов'
 
     market = models.ForeignKey(
         Marketplace,
@@ -115,15 +118,17 @@ class TransportOrderID(models.Model):
         TransportOrder,
         on_delete = models.CASCADE,
         blank = False,
-        verbose_name = 'Транспортно-логистический заказ'
+        verbose_name = 'Заказ'
     )
 
-    order_id = TransportOrderIDField(
+    external_id = TransportOrderExternalIDField(
+        max_length = 40,
         blank = False,
         verbose_name = 'Идентификатор'
     )
 
-    order_code = models.CharField(
+    external_code = models.CharField(
+        max_length = 50,
         default = '',
         blank = True,
         verbose_name = 'Код (человекочитаемый)'
@@ -133,15 +138,19 @@ class TransportOrderID(models.Model):
         max_length = 255,
         default = '',
         blank = True,
-        verbose_name = 'ID транспортно-логистического заказа'
+        verbose_name = 'Идентификатор заказа'
     )
-
-    @property
-    def repr(self):
-        return f'{self.order_id}: {self.order}'
 
     def __str__(self):
         return self.repr
 
     def __repr__(self):
         return self.repr
+
+@receiver(pre_save, sender=TransportOrderExternalID)
+def update_repr(sender: TransportOrderExternalID , **kwargs):
+    order = TransportOrder.objects.get(id=sender.order)
+    marketplace = Marketplace.objects.get(id=sender.market)
+    new_repr = f'ID {order.repr}, {marketplace.repr}: {sender.external_id}'
+    if sender.repr != new_repr:
+        sender.repr = new_repr
