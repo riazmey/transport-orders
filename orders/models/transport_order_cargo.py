@@ -30,8 +30,10 @@ class TransportOrderCargo(models.Model):
         verbose_name = 'Наименование'
     )
 
-    weight = models.FloatField(
-        default = 0.00,
+    weight = models.DecimalField(
+        default = 0.000,
+        max_digits = 15,
+        decimal_places = 3,
         blank = False,
         verbose_name = 'Масса'
     )
@@ -43,8 +45,10 @@ class TransportOrderCargo(models.Model):
         verbose_name = 'Единица измерения массы'
     )
 
-    volume = models.FloatField(
+    volume = models.DecimalField(
         default = 0.00,
+        max_digits = 10,
+        decimal_places = 2,
         blank = True,
         verbose_name = 'Объем'
     )
