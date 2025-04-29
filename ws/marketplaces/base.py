@@ -1,5 +1,6 @@
 
 from django.db import transaction
+from typing import Any, Dict, Tuple
 
 
 class WSMarketplaceBase:
@@ -9,11 +10,12 @@ class WSMarketplaceBase:
         self.url = market.url
         self.login = market.login
         self.password = market.password
+        self.token = market.token
 
     @transaction.atomic
-    def order_import(self, **kwargs) -> (list[dict] | bool):
+    def orders_import(self) -> Tuple[list, bool]:
         result = []
-        data, success = self.order_get(**kwargs)
+        data, success = self.orders_get()
         if success:
             for order_data in data:
                 result += self._order_import(**order_data)
@@ -23,5 +25,5 @@ class WSMarketplaceBase:
         result = []
         return result
 
-    def order_get(self) -> (list[dict] | bool):
+    def orders_get(self) -> Tuple[Any, bool]:
         return [], False

@@ -37,6 +37,7 @@ class TransportOrderCargo(models.Model):
     )
 
     weight_unit = models.CharField(
+        max_length = 4,
         default = '',
         blank = True,
         verbose_name = 'Единица измерения массы'
@@ -49,6 +50,7 @@ class TransportOrderCargo(models.Model):
     )
 
     volume_unit = models.CharField(
+        max_length = 4,
         default = '',
         blank = True,
         verbose_name = 'Единица измерения объема'
@@ -77,6 +79,6 @@ class TransportOrderCargo(models.Model):
 @receiver(pre_save, sender=TransportOrderCargo)
 def update_repr(sender: TransportOrderCargo , **kwargs):
     order = TransportOrder.objects.get(id=sender.order)
-    new_repr = f'{order.repr}: {sender.name}'
+    new_repr = f'{order.repr}: {sender.name}'[:255]
     if sender.repr != new_repr:
         sender.repr = new_repr

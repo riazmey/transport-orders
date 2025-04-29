@@ -38,10 +38,17 @@ class Marketplace(models.Model):
     )
 
     password = models.CharField(
-        max_length = 128,
+        max_length = 100,
         default = '',
         blank = False,
         verbose_name = 'Пароль'
+    )
+
+    token = models.CharField(
+        max_length = 256,
+        default = '',
+        blank = True,
+        verbose_name = 'Ключ безопасности'
     )
 
     repr = models.CharField(
@@ -58,23 +65,22 @@ class Marketplace(models.Model):
         return self.repr
 
 @receiver(pre_save, sender=Marketplace)
-def update_repr(sender: Marketplace , **kwargs):
-    marketplace_type = EnumMarketplaceType.objects.get(id=sender.type)
-    new_repr = f'{marketplace_type.repr} ({sender.url})'
-    if sender.repr != new_repr:
-        sender.repr = new_repr
+def update_repr(sender, instance: Marketplace, **kwargs):
+    new_repr = ''
+    if instance:
+        new_repr = f'{instance.type.repr} ({instance.url}; {instance.login})'[:255]
+    if instance.repr != new_repr:
+        instance.repr = new_repr
 
 @receiver(post_init, sender=Marketplace)
-def initialize_api(sender: Marketplace, **kwargs):
+def initialize_ws(sender, instance: Marketplace, **kwargs):
+    instance.ws = None
+    if not instance.id:
+        return
     try:
-        marketplace_type = EnumMarketplaceType.objects.get(id=sender.type)
-        name_mixin_class = f'WSMarketplace{marketplace_type.name.title()}'
-        ClassMixIn = getattr(importlib.import_module(f'ws.{name_mixin_class}'), name_mixin_class)
-        #ClassMixIn = globals().get(name_mixin_class)
-        if ClassMixIn is None:
-            raise ValueError(f'A MixIn class with name \'{name_mixin_class}\' for the type marketplace \'{marketplace_type.name}\' not found')
+        name_mixin_class = f'WSMarketplace{instance.type.code_str.title()}'
+        ClassMixIn = getattr(importlib.import_module('ws'), name_mixin_class)
         MetaClass = type(name_mixin_class, (ClassMixIn, WSMarketplaceBase), {})
-        sender.api = MetaClass(sender)
+        instance.ws = MetaClass(instance)
     except Exception as e:
         print(f"Error initializing the MixIn class: {e}")
-        sender.api = None

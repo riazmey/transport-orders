@@ -54,6 +54,6 @@ class TransportOrderTruckReqtsLoadingType(models.Model):
 def update_repr(sender: TransportOrderTruckReqtsLoadingType, **kwargs):
     order_truck_reqts = TransportOrderTruckReqts.objects.get(id=sender.order_truck_reqts)
     loading_type = EnumTruckLoadingType.objects.get(id=sender.loading_type)
-    new_repr = f'{order_truck_reqts.repr}: {loading_type.repr} загрузка'
+    new_repr = f'{order_truck_reqts.repr}: {loading_type.repr} загрузка'[:255]
     if sender.repr != new_repr:
         sender.repr = new_repr

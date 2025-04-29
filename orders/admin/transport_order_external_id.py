@@ -1,20 +1,7 @@
 
-from django import forms
+
 from django.contrib import admin
-
-from orders.models import TransportOrderExternalID
-
-
-class TransportOrderExternalIDForm(forms.ModelForm):
-
-    class Meta:
-        model = TransportOrderExternalID
-        fields = [
-            'market',
-            'order',
-            'external_id',
-            'external_code'
-        ]
+from orders.forms import TransportOrderExternalIDForm
 
 
 class TransportOrderExternalIDAdmin(admin.ModelAdmin):

@@ -2,20 +2,11 @@
 from django.db import models
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
-from django.core.exceptions import ValidationError
 
 from .transport_order import TransportOrder
+from orders.validators import validate_transport_order_truck_reqts_temperature
 from ws import WSClassifiers
 
-
-def validate_temperature(value):
-    min_value = -273
-    max_value = 35
-    if value > 35:
-        raise ValidationError(f'The temperature must not be set above {max_value} ℃')
-    if value < min_value:
-        raise ValidationError(f'The temperature must not be set below {min_value} ℃')
-    return value
 
 class TransportOrderTruckReqts(models.Model):
     
@@ -43,6 +34,7 @@ class TransportOrderTruckReqts(models.Model):
     )
 
     weight_unit = models.CharField(
+        max_length = 4,
         default = '',
         blank = False,
         verbose_name = 'Единица измерения массы'
@@ -57,6 +49,7 @@ class TransportOrderTruckReqts(models.Model):
     )
 
     volume_unit = models.CharField(
+        max_length = 4,
         default = '',
         blank = True,
         verbose_name = 'Единица измерения объема'
@@ -70,7 +63,7 @@ class TransportOrderTruckReqts(models.Model):
 
     temperature = models.SmallIntegerField(
         default = 0,
-        validators = [validate_temperature],
+        validators = [validate_transport_order_truck_reqts_temperature],
         blank = True,
         verbose_name = 'Температура'
     )
@@ -86,7 +79,7 @@ class TransportOrderTruckReqts(models.Model):
         max_length = 255,
         default = '',
         blank = True,
-        verbose_name = 'Заказ'
+        verbose_name = 'Требования к транспорту заказа'
     )
 
     def __str__(self):
@@ -111,7 +104,7 @@ def update_repr(sender: TransportOrderTruckReqts, **kwargs):
         else:
             repr_volume = f'{sender.volume} {sender.volume_unit}'
     
-    new_rep = f'{repr_weight} {repr_volume}'.rstrip()
+    new_rep = f'{repr_weight} {repr_volume}'.rstrip()[:255]
 
     if sender.repr != new_rep:
         sender.repr = new_rep

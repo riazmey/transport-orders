@@ -151,6 +151,6 @@ class TransportOrderExternalID(models.Model):
 def update_repr(sender: TransportOrderExternalID , **kwargs):
     order = TransportOrder.objects.get(id=sender.order)
     marketplace = Marketplace.objects.get(id=sender.market)
-    new_repr = f'ID {order.repr}, {marketplace.repr}: {sender.external_id}'
+    new_repr = f'ID {order.repr}, {marketplace.repr}: {sender.external_id}'[:255]
     if sender.repr != new_repr:
         sender.repr = new_repr

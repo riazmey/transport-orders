@@ -2,6 +2,7 @@
 from django.db import models
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+from django.utils.timezone import now
 
 from .marketplace import Marketplace
 from .counterparty import Counterparty
@@ -12,9 +13,11 @@ class TransportOrder(models.Model):
     
     class Meta:
         indexes = [
+            models.Index(fields=['market']),
+            models.Index(fields=['created']),
             models.Index(fields=['status']),
         ]
-        ordering = ['market']
+        ordering = ['market', 'created', 'status']
         verbose_name = 'Заказ'
         verbose_name_plural = 'Заказы'
 
@@ -23,6 +26,11 @@ class TransportOrder(models.Model):
         on_delete = models.PROTECT,
         blank = False,
         verbose_name = 'Торговая площадка'
+    )
+
+    created = models.DateTimeField(
+        blank = False,
+        verbose_name = 'Дата создания'
     )
 
     status = models.ForeignKey(
@@ -83,6 +91,11 @@ class TransportOrder(models.Model):
 
 @receiver(pre_save, sender=TransportOrder)
 def update_repr(sender: TransportOrder, **kwargs):
-    new_repr = f'Заказ №{sender.id}'
+    new_repr = f'Заказ №{sender.id}'[:255]
     if sender.repr != new_repr:
         sender.repr = new_repr
+
+@receiver(pre_save, sender=TransportOrder)
+def update_created(sender: TransportOrder, **kwargs):
+    if not sender.created:
+        sender.created = now

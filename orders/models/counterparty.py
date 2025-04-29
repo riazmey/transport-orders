@@ -68,6 +68,6 @@ class Counterparty(models.Model):
 
 @receiver(pre_save, sender=Counterparty)
 def update_repr(sender: Counterparty , **kwargs):
-    new_repr = f"{sender.name} ({sender.inn}/{sender.kpp})"
+    new_repr = f'{sender.name} ({sender.inn}/{sender.kpp})'[:255]
     if sender.repr != new_repr:
         sender.repr = new_repr

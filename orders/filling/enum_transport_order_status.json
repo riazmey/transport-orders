@@ -1,5 +1,7 @@
 [
-	{"code_str": "deferred", "repr": "Аукцион - ожидает старта"},
-	{"code_str": "auction", "repr": "Аукцион - ожидает распределения?"},
-	{"code_str": "no_data", "repr": "распределен, ожидает подтверждения"}
+	{"code_str": "draft", "repr": "Новый - ожидает дальнейших действий"},
+	{"code_str": "auction", "repr": "Аукцион"},
+	{"code_str": "waiting_start", "repr": "Ожидание начала исполнения"},
+	{"code_str": "in_progress", "repr": "В работе"},
+	{"code_str": "completed", "repr": "Выполнен"}
 ]

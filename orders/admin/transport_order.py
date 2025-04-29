@@ -1,30 +1,12 @@
 
-from django import forms
 from django.contrib import admin
-
-from orders.models import TransportOrder
-
-
-class TransportOrderForm(forms.ModelForm):
-    class Meta:
-        model = TransportOrder
-        fields = [
-            'market',
-            'status',
-            'counterparty',
-            'price',
-            'currency',
-            'rate_vat',
-            'comment'
-        ]
-        widgets = {
-            'comment': forms.Textarea(),
-        }
+from orders.forms import TransportOrderForm
 
 
 class TransportOrderAdmin(admin.ModelAdmin):
     fields = [
         ('market', 'status'),
+        'created',
         'counterparty',
         ('price', 'currency'),
         'rate_vat',
@@ -33,6 +15,7 @@ class TransportOrderAdmin(admin.ModelAdmin):
     list_display = [
         'market',
         'status',
+        'created',
         'counterparty',
         'price',
         'currency',
@@ -46,6 +29,7 @@ class TransportOrderAdmin(admin.ModelAdmin):
     list_filter = [
         'market',
         'status',
+        'created',
         'counterparty'
     ]
     ordering = [

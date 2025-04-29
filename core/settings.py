@@ -82,7 +82,7 @@ if use_vars_env:
 else:
     WEB_SERVICES = {
         "classifiers": {
-            "URL": "http://127.0.0.1:8000",
+            "URL": "http://127.0.0.1:8100",
         }
     }
 

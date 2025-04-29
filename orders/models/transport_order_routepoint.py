@@ -1,5 +1,6 @@
 
 from django.db import models
+from django.utils.timezone import now
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
@@ -32,9 +33,8 @@ class TransportOrderRoutepoint(models.Model):
     )
 
     date = models.DateTimeField(
-        #auto_now_add = True,
         blank = False,
-        verbose_name = 'Дата'
+        verbose_name = 'Дата действия'
     )
 
     address = models.CharField(
@@ -65,6 +65,13 @@ class TransportOrderRoutepoint(models.Model):
         verbose_name = 'Комментарий'
     )
 
+    repr = models.CharField(
+        max_length = 255,
+        default = '',
+        blank = True,
+        verbose_name = 'Точка маршрута заказа'
+    )
+
     def __str__(self):
         return self.repr
 
@@ -74,7 +81,11 @@ class TransportOrderRoutepoint(models.Model):
 @receiver(pre_save, sender=TransportOrderRoutepoint)
 def update_repr(sender: TransportOrderRoutepoint , **kwargs):
     order = TransportOrder.objects.get(id=sender.order)
-    new_repr = f'Точка маршрута {order.repr}: {sender.address}'
+    new_repr = f'Точка маршрута {order.repr}: {sender.address}'[:255]
     if sender.repr != new_repr:
         sender.repr = new_repr
 
+@receiver(pre_save, sender=TransportOrderRoutepoint)
+def update_date(sender: TransportOrderRoutepoint, **kwargs):
+    if not sender.date:
+        sender.date = now

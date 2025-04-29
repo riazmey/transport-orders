@@ -1,23 +1,6 @@
 
-from django import forms
 from django.contrib import admin
-
-from orders.models import Marketplace
-
-
-class MarketplaceForm(forms.ModelForm):
-    class Meta:
-        model = Marketplace
-        fields = [
-            'type',
-            'url',
-            'login',
-            'password'
-        ]
-        widgets = {
-            'url': forms.URLInput(),
-            'password': forms.PasswordInput()
-        }
+from orders.forms import MarketplaceForm
 
 
 class MarketplaceAdmin(admin.ModelAdmin):
@@ -25,15 +8,20 @@ class MarketplaceAdmin(admin.ModelAdmin):
         'type',
         'url',
         'login',
-        'password'
+        'password',
+        'token'
     ]
     list_display = [
         'type',
+        'url',
         'login'
     ]
     search_fields = [
         'url',
-        'type__repr'
+        'login'
+    ]
+    list_filter = [
+        'type'
     ]
     ordering = ['type']
     form = MarketplaceForm

@@ -2,7 +2,7 @@
 import json
 import requests
 from django.conf import settings
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, Tuple, List
 
 
 class WSClassifiers:
@@ -20,13 +20,23 @@ class WSClassifiers:
             'User-Agent': 'Django Client'
         }
 
-    def get_currency(self, params: Dict = None) -> Tuple[Any, bool]:
+    def list_units(self, params: Dict) -> List[Tuple[str, str]]:
+        result = []
+        units, success = self.get_units(params)
+        if success:
+            for unit_data in units:
+                code_dec = unit_data.get('code_dec')
+                name = unit_data.get('name')
+                result.append((code_dec, name))
+        return result
+
+    def get_currency(self, params: Dict) -> Tuple[Any, bool]:
         return self._request(requests.get, self.URNs.currency, params)
 
-    def get_unit_by_code_str(self, code_str: str) -> Tuple[Any, bool]:
-        return self._request(requests.get, self.URNs.unit, {'code_str': code_str})
+    def get_unit(self, code_dec: str) -> Tuple[Any, bool]:
+        return self._request(requests.get, self.URNs.unit, {'code_dec': code_dec})
 
-    def get_units(self, params: Dict = None) -> Tuple[Any, bool]:
+    def get_units(self, params: Dict) -> Tuple[Any, bool]:
         return self._request(requests.get, self.URNs.units, params)
 
     def get_rate_vat(self, params: Dict = None) -> Tuple[Any, bool]:
