@@ -6,16 +6,14 @@ from .enum_transport_order_status import EnumTransportOrderStatus
 
 from .counterparty import Counterparty
 from .marketplace import Marketplace
+from .marketplace_base_ws import MarketplaceBaseWS
 
 from .transport_order import TransportOrder
 from .transport_order_truck_reqts import TransportOrderTruckReqts
 from .transport_order_truck_reqts_loading_type import TransportOrderTruckReqtsLoadingType
 from .transport_order_external_id import TransportOrderExternalID
-from .transport_order_external_id import TransportOrderExternalIDField
-from .transport_order_external_id import TransportOrderExternalIDValue
 from .transport_order_cargo import TransportOrderCargo
 from .transport_order_routepoint import TransportOrderRoutepoint
-
 
 __all__ = [
     EnumMarketplaceType,
@@ -24,12 +22,10 @@ __all__ = [
     EnumTransportOrderStatus,
     Counterparty,
     Marketplace,
+    MarketplaceBaseWS,
     TransportOrder,
     TransportOrderTruckReqts,
     TransportOrderTruckReqtsLoadingType,
     TransportOrderExternalID,
-    TransportOrderExternalIDField,
-    TransportOrderExternalIDValue,
     TransportOrderCargo,
-    TransportOrderRoutepoint,
-]
+    TransportOrderRoutepoint]

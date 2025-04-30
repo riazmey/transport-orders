@@ -9,8 +9,7 @@ from orders.models import (
     TransportOrderTruckReqtsLoadingType,
     TransportOrderExternalID,
     TransportOrderCargo,
-    TransportOrderRoutepoint
-)
+    TransportOrderRoutepoint)
 
 from .counterparty import CounterpartyAdmin
 from .marketplace import MarketplaceAdmin

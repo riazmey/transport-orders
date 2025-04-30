@@ -9,9 +9,10 @@ class SerializerTransportOrderTruckReqtsLoadingType(serializers.Serializer):
     loading_type = SerializerEnumTruckLoadingType()
 
     class Meta:
-        model = TransportOrderTruckReqtsLoadingType
+
         fields = (
             'order_truck_reqts',
             'loading_type',
-            'repr'
-        )
+            'repr')
+
+        model = TransportOrderTruckReqtsLoadingType

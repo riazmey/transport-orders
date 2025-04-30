@@ -15,18 +15,22 @@ class TransportOrderCargoForm(forms.ModelForm):
         choices = ws.list_units({'type':'volume'}),
         initial = '113'
     )
+    hazard_class = forms.ChoiceField(
+        choices = ws.list_hazard_class(),
+        initial = '0'
+    )
 
     class Meta:
-        model = TransportOrderCargo
+
         fields = [
             'order',
             'name',
+            'hazard_class',
             'weight',
             'weight_unit',
             'volume',
             'volume_unit',
-            'comment'
-        ]
-        widgets = {
-            'comment': forms.Textarea(),
-        }
+            'comment']
+
+        widgets = {'comment': forms.Textarea()}
+        model = TransportOrderCargo

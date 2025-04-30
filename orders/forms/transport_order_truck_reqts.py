@@ -18,7 +18,7 @@ class TransportOrderTruckReqtsForm(forms.ModelForm):
     )
 
     class Meta:
-        model = TransportOrderTruckReqts
+
         fields = [
             'order',
             'weight',
@@ -27,8 +27,7 @@ class TransportOrderTruckReqtsForm(forms.ModelForm):
             'volume_unit',
             'refrigeration',
             'temperature',
-            'comment'
-        ]
-        widgets = {
-            'comment': forms.Textarea(),
-        }
+            'comment']
+
+        widgets = {'comment': forms.Textarea()}
+        model = TransportOrderTruckReqts

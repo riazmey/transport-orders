@@ -10,15 +10,13 @@ from .transport_order_truck_reqts import TransportOrderTruckReqts
 class TransportOrderTruckReqtsLoadingType(models.Model):
     
     class Meta:
+        
         constraints = [
             models.UniqueConstraint(
                 fields=['order_truck_reqts', 'loading_type'],
-                name='unique_order_truck_reqts_per_loading_type'
-            )
-        ]
-        indexes = [
-            models.Index(fields=['order_truck_reqts']),
-        ]
+                name='unique_order_truck_reqts_per_loading_type')]
+        
+        indexes = [models.Index(fields=['order_truck_reqts'])]
         ordering = ['order_truck_reqts', 'loading_type']
         verbose_name = 'Требование к загрузке грузового транспорта'
         verbose_name_plural = 'Требования к загрузке грузовых транспортов'
@@ -27,22 +25,19 @@ class TransportOrderTruckReqtsLoadingType(models.Model):
         TransportOrderTruckReqts,
         on_delete = models.CASCADE,
         blank = False,
-        verbose_name = 'Требование к транспорту заказа'
-    )
+        verbose_name = 'Требование к транспорту заказа')
 
     loading_type = models.ForeignKey(
         EnumTruckLoadingType,
         on_delete = models.PROTECT,
         blank = False,
-        verbose_name = 'Тип загрузки'
-    )
+        verbose_name = 'Тип загрузки')
 
     repr = models.CharField(
         max_length = 255,
         default = '',
         blank = True,
-        verbose_name = 'Требование к загрузке грузового транспорта'
-    )
+        verbose_name = 'Требование к загрузке грузового транспорта')
 
     def __str__(self):
         return self.repr
@@ -51,9 +46,9 @@ class TransportOrderTruckReqtsLoadingType(models.Model):
         return self.repr
 
 @receiver(pre_save, sender=TransportOrderTruckReqtsLoadingType)
-def update_repr(sender: TransportOrderTruckReqtsLoadingType, **kwargs):
-    order_truck_reqts = TransportOrderTruckReqts.objects.get(id=sender.order_truck_reqts)
-    loading_type = EnumTruckLoadingType.objects.get(id=sender.loading_type)
+def update_repr(sender, instance: TransportOrderTruckReqtsLoadingType, **kwargs):
+    order_truck_reqts = TransportOrderTruckReqts.objects.get(id=instance.order_truck_reqts)
+    loading_type = EnumTruckLoadingType.objects.get(id=instance.loading_type)
     new_repr = f'{order_truck_reqts.repr}: {loading_type.repr} загрузка'[:255]
-    if sender.repr != new_repr:
-        sender.repr = new_repr
+    if instance.repr != new_repr:
+        instance.repr = new_repr

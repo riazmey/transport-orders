@@ -4,36 +4,37 @@ from orders.forms import TransportOrderRoutepointForm
 
 
 class TransportOrderRoutepointAdmin(admin.ModelAdmin):
+    
     fields = [
         'order',
-        ('action', 'date'),
+        ('action', 'date_start', 'date_end'),
         'address',
         'counterparty',
         'contact_person',
-        'comment'
-    ]
+        'comment']
+    
     list_display = [
         'order',
         'action',
         'date',
         'address',
         'counterparty',
-        'contact_person'
-    ]
+        'contact_person']
+    
     search_fields = [
         'order',
         'address',
         'date',
         'counterparty',
-        'contact_person'
-    ]
+        'contact_person']
+    
     list_filter = [
         'order',
-        'action'
-    ]
+        'action']
+    
     ordering = [
         'order',
         'action',
-        'address'
-    ]
+        'address']
+
     form = TransportOrderRoutepointForm

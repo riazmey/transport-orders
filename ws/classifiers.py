@@ -17,8 +17,7 @@ class WSClassifiers:
         self.url = settings.WEB_SERVICES.get('classifiers').get('URL')
         self.base_headers = {
             'Content-Type': 'application/json; charset=utf-8',
-            'User-Agent': 'Django Client'
-        }
+            'User-Agent': 'Django Client'}
 
     def list_units(self, params: Dict) -> List[Tuple[str, str]]:
         result = []
@@ -28,6 +27,16 @@ class WSClassifiers:
                 code_dec = unit_data.get('code_dec')
                 name = unit_data.get('name')
                 result.append((code_dec, name))
+        return result
+    
+    def list_hazard_class(self) -> List[Tuple[str, str]]:
+        result = []
+        hazard_classes, success = self.get_cargo_hazard()
+        if success:
+            for class_data in hazard_classes:
+                code_str = class_data.get('code_str')
+                name = class_data.get('name')
+                result.append((code_str, name))
         return result
 
     def get_currency(self, params: Dict) -> Tuple[Any, bool]:

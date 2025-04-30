@@ -6,17 +6,19 @@ from orders.models import TransportOrderRoutepoint
 class TransportOrderRoutepointForm(forms.ModelForm):
 
     class Meta:
-        model = TransportOrderRoutepoint
+
         fields = [
             'order',
             'action',
-            'date',
+            'date_start',
+            'date_end',
             'address',
             'counterparty',
             'contact_person',
-            'comment'
-        ]
+            'comment']
+
         widgets = {
             'address': forms.Textarea(),
-            'comment': forms.Textarea(),
-        }
+            'comment': forms.Textarea()}
+        
+        model = TransportOrderRoutepoint

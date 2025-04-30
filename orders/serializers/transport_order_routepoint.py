@@ -9,7 +9,7 @@ class SerializerTransportOrderRoutepoint(serializers.Serializer):
     action = SerializerEnumRoutepointAction()
 
     class Meta:
-        model = TransportOrderRoutepoint
+
         fields = (
             'order',
             'action',
@@ -18,5 +18,6 @@ class SerializerTransportOrderRoutepoint(serializers.Serializer):
             'counterparty',
             'contact_person',
             'comment',
-            'repr'
-        )
+            'repr')
+
+        model = TransportOrderRoutepoint

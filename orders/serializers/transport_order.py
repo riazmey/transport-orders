@@ -20,7 +20,7 @@ class SerializerTransportOrder(serializers.ModelSerializer):
     truck_requirements = SerializerTransportOrderTruckReqts()
 
     class Meta:  
-        model = TransportOrder 
+
         fields = (
             'market',
             'status',
@@ -33,8 +33,9 @@ class SerializerTransportOrder(serializers.ModelSerializer):
             'price',
             'rate_vat',
             'comment',
-            'repr'
-        )
+            'repr')
 
-class TransportOrderAPIViewSerializerParams(serializers.Serializer):
+        model = TransportOrder
+
+class SerializerTransportOrderAPIViewParams(serializers.Serializer):
     id = serializers.CharField(validators=[validate_transport_order_id])

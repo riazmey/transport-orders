@@ -6,8 +6,9 @@ from orders.models import EnumTruckLoadingType
 class SerializerEnumTruckLoadingType(serializers.Serializer):
     
     class Meta:
-        model = EnumTruckLoadingType
+
         fields = (
             'code_str',
-            'repr'
-        )
+            'repr')
+
+        model = EnumTruckLoadingType

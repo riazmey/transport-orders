@@ -6,7 +6,7 @@ from orders.models import TransportOrderCargo
 class SerializerTransportOrderCargo(serializers.Serializer):
 
     class Meta:
-        model = TransportOrderCargo
+
         fields = (
             'order',
             'name',
@@ -15,5 +15,6 @@ class SerializerTransportOrderCargo(serializers.Serializer):
             'volume',
             'volume_unit',
             'comment',
-            'repr'
-        )
+            'repr')
+
+        model = TransportOrderCargo

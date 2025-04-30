@@ -4,14 +4,15 @@ from orders.forms import TransportOrderForm
 
 
 class TransportOrderAdmin(admin.ModelAdmin):
+
     fields = [
         ('market', 'status'),
         'created',
         'counterparty',
         ('price', 'currency'),
         'rate_vat',
-        'comment'
-    ]
+        'comment']
+
     list_display = [
         'market',
         'status',
@@ -19,23 +20,23 @@ class TransportOrderAdmin(admin.ModelAdmin):
         'counterparty',
         'price',
         'currency',
-        'rate_vat'
-    ]
+        'rate_vat']
+
     search_fields = [
         'id',
         'counterparty__repr',
-        'price'
-    ]
+        'price']
+
     list_filter = [
         'market',
         'status',
         'created',
-        'counterparty'
-    ]
+        'counterparty']
+
     ordering = [
         'market',
         'status',
         'currency',
-        'price'
-    ]
+        'price']
+
     form = TransportOrderForm

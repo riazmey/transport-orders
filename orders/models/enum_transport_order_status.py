@@ -4,9 +4,7 @@ from django.db import models
 class EnumTransportOrderStatus(models.Model):
 
     class Meta:
-        indexes = [
-            models.Index(fields=['code_str'])
-        ]
+        indexes = [models.Index(fields=['code_str'])]
         ordering = ['code_str']
         verbose_name = 'Статус заказа'
         verbose_name_plural = 'Статусы заказов'
@@ -16,15 +14,13 @@ class EnumTransportOrderStatus(models.Model):
         default = '',
         blank = False,
         unique = True,
-        verbose_name = 'Код (строковый)'
-    )
+        verbose_name = 'Код (строковый)')
 
     repr = models.CharField(
         max_length = 255,
         default = '',
         blank = False,
-        verbose_name = 'Статус заказа'
-    )
+        verbose_name = 'Статус заказа')
 
     def __str__(self):
         return self.repr

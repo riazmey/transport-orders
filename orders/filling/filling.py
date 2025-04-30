@@ -3,10 +3,11 @@ import os
 import json
 
 from django.db import transaction
-from orders.models import EnumMarketplaceType
-from orders.models import EnumRoutepointAction
-from orders.models import EnumTruckLoadingType
-from orders.models import EnumTransportOrderStatus
+from orders.models import (
+    EnumMarketplaceType,
+    EnumRoutepointAction,
+    EnumTruckLoadingType,
+    EnumTransportOrderStatus)
 
 
 @transaction.atomic
@@ -20,10 +21,9 @@ def filling_enum_marketplace_type():
             comment = item_data.get('_comment', '')
             if comment:
                 continue
-            defaults = {
-                'repr': item_data.get('repr', '')
-            }
-            data_object, created = EnumMarketplaceType.objects.update_or_create(code_str=code_str, defaults=defaults)
+            defaults = {'repr': item_data.get('repr', '')}
+            data_object, created = EnumMarketplaceType.objects.update_or_create(
+                code_str=code_str, defaults=defaults)
             if created == True:
                 print(f' Created marketplace type: {data_object.repr}')
             else:
@@ -41,10 +41,9 @@ def filling_enum_routepoint_action():
             comment = item_data.get('_comment', '')
             if comment:
                 continue
-            defaults = {
-                'repr': item_data.get('repr', '')
-            }
-            data_object, created = EnumRoutepointAction.objects.update_or_create(code_str=code_str, defaults=defaults)
+            defaults = {'repr': item_data.get('repr', '')}
+            data_object, created = EnumRoutepointAction.objects.update_or_create(
+                code_str=code_str, defaults=defaults)
             if created == True:
                 print(f' Created routerpoint action: {data_object.repr}')
             else:
@@ -62,10 +61,9 @@ def filling_enum_truck_loading_type():
             comment = item_data.get('_comment', '')
             if comment:
                 continue
-            defaults = {
-                'repr': item_data.get('repr', '')
-            }
-            data_object, created = EnumTruckLoadingType.objects.update_or_create(code_str=code_str, defaults=defaults)
+            defaults = {'repr': item_data.get('repr', '')}
+            data_object, created = EnumTruckLoadingType.objects.update_or_create(
+                code_str=code_str, defaults=defaults)
             if created == True:
                 print(f' Created truck loading type: {data_object.repr}')
             else:
@@ -83,10 +81,9 @@ def filling_enum_transport_order_status():
             comment = item_data.get('_comment', '')
             if comment:
                 continue
-            defaults = {
-                'repr': item_data.get('repr', '')
-            }
-            data_object, created = EnumTransportOrderStatus.objects.update_or_create(code_str=code_str, defaults=defaults)
+            defaults = {'repr': item_data.get('repr', '')}
+            data_object, created = EnumTransportOrderStatus.objects.update_or_create(
+                code_str=code_str, defaults=defaults)
             if created == True:
                 print(f' Created transport order status: {data_object.repr}')
             else:

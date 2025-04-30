@@ -6,7 +6,7 @@ from django.dispatch import receiver
 from django.db import models
 
 from .enum_marketplace_type import EnumMarketplaceType
-from ws import WSMarketplaceBase
+from .marketplace_base_ws import MarketplaceBaseWS
 
 
 class Marketplace(models.Model):
@@ -21,42 +21,36 @@ class Marketplace(models.Model):
         on_delete = models.PROTECT,
         db_index = True,
         blank = False,
-        verbose_name = 'Тип площадки'
-    )
+        verbose_name = 'Тип площадки')
 
     url = models.URLField(
         default = '',
         blank = False,
-        verbose_name = 'Адрес (URL)'
-    )
+        verbose_name = 'Адрес (URL)')
 
     login = models.CharField(
         max_length = 100,
         default = '',
         blank = False,
-        verbose_name = 'Логин'
-    )
+        verbose_name = 'Логин')
 
     password = models.CharField(
         max_length = 100,
         default = '',
         blank = False,
-        verbose_name = 'Пароль'
-    )
+        verbose_name = 'Пароль')
 
     token = models.CharField(
         max_length = 256,
         default = '',
         blank = True,
-        verbose_name = 'Ключ безопасности'
-    )
+        verbose_name = 'Ключ безопасности')
 
     repr = models.CharField(
         max_length = 255,
         default = '',
         blank = True,
-        verbose_name = 'Площадка'
-    )
+        verbose_name = 'Площадка')
 
     def __str__(self):
         return self.repr
@@ -80,7 +74,7 @@ def initialize_ws(sender, instance: Marketplace, **kwargs):
     try:
         name_mixin_class = f'WSMarketplace{instance.type.code_str.title()}'
         ClassMixIn = getattr(importlib.import_module('ws'), name_mixin_class)
-        MetaClass = type(name_mixin_class, (ClassMixIn, WSMarketplaceBase), {})
+        MetaClass = type(name_mixin_class, (ClassMixIn, MarketplaceBaseWS), {})
         instance.ws = MetaClass(instance)
     except Exception as e:
         print(f"Error initializing the MixIn class: {e}")

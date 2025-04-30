@@ -8,7 +8,6 @@ from .transport_order_external_id import TransportOrderExternalIDForm
 from .transport_order_cargo import TransportOrderCargoForm
 from .transport_order_routepoint import TransportOrderRoutepointForm
 
-
 __all__ = [
     CounterpartyForm,
     MarketplaceForm,
@@ -17,5 +16,4 @@ __all__ = [
     TransportOrderTruckReqtsLoadingTypeForm,
     TransportOrderExternalIDForm,
     TransportOrderCargoForm,
-    TransportOrderRoutepointForm
-]
+    TransportOrderRoutepointForm]

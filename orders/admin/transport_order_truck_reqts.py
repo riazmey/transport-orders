@@ -4,13 +4,14 @@ from orders.forms import TransportOrderTruckReqtsForm
 
 
 class TransportOrderTruckReqtsAdmin(admin.ModelAdmin):
+    
     fields = [
         'order',
         ('weight', 'weight_unit'),
         ('volume', 'volume_unit'),
         ('refrigeration', 'temperature'),
-        'comment'
-    ]
+        'comment']
+    
     list_display = [
         'order',
         'weight',
@@ -18,18 +19,18 @@ class TransportOrderTruckReqtsAdmin(admin.ModelAdmin):
         'volume',
         'volume_unit',
         'refrigeration',
-        'temperature'
-    ]
+        'temperature']
+    
     search_fields = [
         'order__repr',
-        'comment'
-    ]
+        'comment']
+    
     list_filter = [
         'order',
         'refrigeration',
         'temperature',
         'weight',
-        'volume'
-    ]
+        'volume']
+
     ordering = ['order']
     form = TransportOrderTruckReqtsForm

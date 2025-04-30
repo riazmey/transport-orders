@@ -4,20 +4,21 @@ from orders.forms import CounterpartyForm
 
 
 class CounterpartyAdmin(admin.ModelAdmin):
+
     fields = [
         'name',
         'name_full',
-        ('inn', 'kpp')
-    ]
+        ('inn', 'kpp')]
+
     list_display = [
         'name',
         'name_full',
         'inn',
-        'kpp'
-    ]
+        'kpp']
+
     search_fields = [
         'name',
-        'inn'
-    ]
+        'inn']
+
     ordering = ['name']
     form = CounterpartyForm

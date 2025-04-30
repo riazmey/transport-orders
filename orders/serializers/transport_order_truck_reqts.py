@@ -9,7 +9,7 @@ class SerializerTransportOrderTruckReqts(serializers.Serializer):
     loading_types = SerializerTransportOrderTruckReqtsLoadingType()
 
     class Meta:
-        model = TransportOrderTruckReqts
+
         fields = (
             'order',
             'weight',
@@ -20,5 +20,6 @@ class SerializerTransportOrderTruckReqts(serializers.Serializer):
             'temperature',
             'loading_types'
             'comment',
-            'repr'
-        )
+            'repr')
+        
+        model = TransportOrderTruckReqts

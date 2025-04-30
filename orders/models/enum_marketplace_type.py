@@ -4,9 +4,7 @@ from django.db import models
 class EnumMarketplaceType(models.Model):
 
     class Meta:
-        indexes = [
-            models.Index(fields=['code_str'])
-        ]
+        indexes = [models.Index(fields=['code_str'])]
         ordering = ['code_str']
         verbose_name = 'Тип площадки'
         verbose_name_plural = 'Типы площадок'
@@ -16,15 +14,13 @@ class EnumMarketplaceType(models.Model):
         default = '',
         blank = False,
         unique = True,
-        verbose_name = 'Код (строковый)'
-    )
+        verbose_name = 'Код (строковый)')
 
     repr = models.CharField(
         max_length = 255,
         default = '',
         blank = False,
-        verbose_name = 'Тип площадки'
-    )
+        verbose_name = 'Тип площадки')
 
     def __str__(self):
         return self.repr

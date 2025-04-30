@@ -4,24 +4,23 @@ from orders.forms import MarketplaceForm
 
 
 class MarketplaceAdmin(admin.ModelAdmin):
+
     fields = [
         'type',
         'url',
         'login',
         'password',
-        'token'
-    ]
+        'token']
+
     list_display = [
         'type',
         'url',
-        'login'
-    ]
+        'login']
+
     search_fields = [
         'url',
-        'login'
-    ]
-    list_filter = [
-        'type'
-    ]
+        'login']
+
+    list_filter = ['type']
     ordering = ['type']
     form = MarketplaceForm

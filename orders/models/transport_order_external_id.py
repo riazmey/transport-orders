@@ -93,16 +93,16 @@ class TransportOrderExternalIDField(CharField):
 class TransportOrderExternalID(models.Model):
 
     class Meta:
+
         constraints = [
             models.UniqueConstraint(
                 fields=['market', 'order', 'external_id'],
-                name='unique_order_per_market'
-            )
-        ]
+                name='unique_order_per_market')]
+
         indexes = [
             models.Index(fields=['market', 'external_id'], name='market_order_id_idx'),
-            models.Index(fields=['order_id'], name='order_id_idx')
-        ]
+            models.Index(fields=['order_id'], name='order_id_idx')]
+
         ordering = ['order', 'market', 'external_code', 'external_id']
         verbose_name = 'Идентификатор заказа'
         verbose_name_plural = 'Идентификаторы заказов'
@@ -111,35 +111,30 @@ class TransportOrderExternalID(models.Model):
         Marketplace,
         on_delete = models.PROTECT,
         blank = False,
-        verbose_name = 'Площадка'
-    )
+        verbose_name = 'Площадка')
     
     order = models.ForeignKey(
         TransportOrder,
         on_delete = models.CASCADE,
         blank = False,
-        verbose_name = 'Заказ'
-    )
+        verbose_name = 'Заказ')
 
     external_id = TransportOrderExternalIDField(
         max_length = 40,
         blank = False,
-        verbose_name = 'Идентификатор'
-    )
+        verbose_name = 'Идентификатор')
 
     external_code = models.CharField(
         max_length = 50,
         default = '',
         blank = True,
-        verbose_name = 'Код (человекочитаемый)'
-    )
+        verbose_name = 'Код (человекочитаемый)')
 
     repr = models.CharField(
         max_length = 255,
         default = '',
         blank = True,
-        verbose_name = 'Идентификатор заказа'
-    )
+        verbose_name = 'Идентификатор заказа')
 
     def __str__(self):
         return self.repr
@@ -148,9 +143,9 @@ class TransportOrderExternalID(models.Model):
         return self.repr
 
 @receiver(pre_save, sender=TransportOrderExternalID)
-def update_repr(sender: TransportOrderExternalID , **kwargs):
-    order = TransportOrder.objects.get(id=sender.order)
-    marketplace = Marketplace.objects.get(id=sender.market)
-    new_repr = f'ID {order.repr}, {marketplace.repr}: {sender.external_id}'[:255]
-    if sender.repr != new_repr:
-        sender.repr = new_repr
+def update_repr(sender, instance: TransportOrderExternalID , **kwargs):
+    order = TransportOrder.objects.get(id=instance.order)
+    marketplace = Marketplace.objects.get(id=instance.market)
+    new_repr = f'ID {order.repr}, {marketplace.repr}: {instance.external_id}'[:255]
+    if instance.repr != new_repr:
+        instance.repr = new_repr

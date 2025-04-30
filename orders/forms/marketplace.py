@@ -5,16 +5,17 @@ from orders.models import Marketplace
 
 class MarketplaceForm(forms.ModelForm):
     class Meta:
-        model = Marketplace
+
         fields = [
             'type',
             'url',
             'login',
             'password',
-            'token'
-        ]
+            'token']
+
         widgets = {
             'url': forms.URLInput(),
             'password': forms.PasswordInput(),
-            'token': forms.PasswordInput()
-        }
+            'token': forms.PasswordInput()}
+
+        model = Marketplace
