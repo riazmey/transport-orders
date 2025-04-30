@@ -2,7 +2,7 @@
 from tabnanny import verbose
 from django import forms
 from orders.models import TransportOrderTruckReqts
-from ws import WSClassifiers
+from ws.classifiers import WSClassifiers
 
 
 class TransportOrderTruckReqtsForm(forms.ModelForm):

@@ -23,8 +23,8 @@ class WSMarketplaceAtrucks:
         result = []
         data, received = self._request(requests.get, self.URNs.order)
         if received:
-            for data_order in data:
-                result.append(self._convert_data_ws_order(data_order))
+            for item_data in data:
+                result.append(self._convert_data_ws_order(item_data.get('order')))
         return result, received
    
     def _request(self, method: requests.Request, urn: str, params: Dict = None) -> Tuple[Any, bool]:
@@ -45,7 +45,7 @@ class WSMarketplaceAtrucks:
 
     @classmethod
     def _convert_data_ws_order(cls, data_order: dict) -> dict:
-
+        
         return {
             'external_id': cls._convert_data_ws_order_external_id(data_order),
             'created': cls._convert_data_ws_order_created(data_order),
@@ -60,9 +60,10 @@ class WSMarketplaceAtrucks:
 
     @classmethod
     def _convert_data_ws_order_external_id(cls, data_order: dict) -> dict:
-        result = {'external_id': '', 'external_code': ''}
         order_id = data_order.get('order_id', '')
         order_human_name = data_order.get('order_human_name', '')
+        print(f'    order_id: {order_id}')
+        print(f'    order_human_name: {order_human_name}')
         if order_id:
             return {
                 'external_id': order_id,
@@ -73,12 +74,12 @@ class WSMarketplaceAtrucks:
 
     @classmethod
     def _convert_data_ws_order_status_code(cls, data_order: dict) -> str:
-        order_status = data_order.get('order_status', '')
-        status_code = cls._convert_data_ws_status_code(order_status)
+        status = data_order.get('status', '')
+        status_code = cls._convert_data_ws_status_code(status)
         if status_code:
             return status_code
         else:
-            message = f'It was not possible to compare the received order status "{order_status}"'
+            message = f'It was not possible to compare the received order status "{status}"'
             raise RequestAborted(message)
 
     @classmethod
@@ -105,18 +106,20 @@ class WSMarketplaceAtrucks:
 
 
     @classmethod
-    def _convert_data_ws_order_cargo(cls, data_order: dict) -> dict:
+    def _convert_data_ws_order_cargo(cls, data_order: dict) -> list[dict]:
+        result = []
         cargo = data_order.get('cargo')
         if isinstance(cargo, dict) | len(cargo) >= 3:
-            cargo = {
+            result.append({
                 'name': cargo.get('name', ''),
                 'weight': cls._value_to_float(cargo.get('weight')),
                 'weight_unit': '168',
                 'volume': cls._value_to_float(cargo.get('volume')),
-                'volume_unit': '113'}
+                'volume_unit': '113'})
         else:
             message = 'The "cargo" property is missing or incorrectly filled in the received data'
             raise RequestAborted(message)
+        return result
 
     @classmethod
     def _convert_data_ws_order_truck_requirements(cls, data_order: dict) -> dict:
@@ -146,16 +149,16 @@ class WSMarketplaceAtrucks:
             raise RequestAborted(message)
 
     @classmethod
-    def _convert_data_ws_order_routepoints(cls, data_order: dict) -> dict:
+    def _convert_data_ws_order_routepoints(cls, data_order: dict) -> list[dict]:
         route = data_order.get('route')
-        routepoints = []
+        result = []
         if isinstance(route, dict):
-            waypoints = data_order.get('waypoints')
+            waypoints = route.get('waypoints')
             if isinstance(waypoints, list):
                 for data_waypoint in waypoints:
                     arrival_date = data_waypoint.get('arrival_date')
                     address = data_waypoint.get('address')
-                    routepoints.append({
+                    result.append({
                         'action': cls._convert_data_ws_action(data_waypoint.get('waypoint_type')),
                         'date_start': parser.parse(arrival_date[0]),
                         'date_end': parser.parse(arrival_date[1]),
@@ -170,16 +173,20 @@ class WSMarketplaceAtrucks:
         else:
             message = 'The "route" property is missing in the received data'
             raise RequestAborted(message)
+        return result
 
     @classmethod
     def _convert_data_ws_order_rate_vat(cls, data_order: dict) -> str:
         vat_type = ''
         start_price_vat_type = cls._value_to_str(data_order.get('start_price_vat_type'))
         current_price_vat_type = cls._value_to_str(data_order.get('current_price_vat_type'))
+        print(f'     start_price_vat_type: {start_price_vat_type}')
+        print(f'     current_price_vat_type: {current_price_vat_type}')
         if current_price_vat_type:
             vat_type = current_price_vat_type
         elif start_price_vat_type:
             vat_type = start_price_vat_type
+        print(f'     vat_type: {vat_type}')
         rate_vat = cls._convert_data_ws_rate_vat(vat_type)
         if rate_vat:
             return rate_vat
@@ -194,7 +201,7 @@ class WSMarketplaceAtrucks:
             result = value
         elif isinstance(value, int):
             result = float(value)
-        elif isinstance(value, str) | value.replace('.','',1).isdigit():
+        elif isinstance(value, str) and value.replace('.','', 1).isdigit():
             result = float(value)
         return result
 
@@ -239,6 +246,8 @@ class WSMarketplaceAtrucks:
     def _convert_data_ws_rate_vat(cls, value: str) -> str:
         result = ''
         match value:
+            case 'zero_vat':
+                result = 'with_vat0'
             case 'with_vat':
                 result = 'with_vat20'
             case 'with_vat5':

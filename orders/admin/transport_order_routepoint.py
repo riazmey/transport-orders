@@ -16,7 +16,8 @@ class TransportOrderRoutepointAdmin(admin.ModelAdmin):
     list_display = [
         'order',
         'action',
-        'date',
+        'date_start',
+        'date_end',
         'address',
         'counterparty',
         'contact_person']
@@ -24,7 +25,7 @@ class TransportOrderRoutepointAdmin(admin.ModelAdmin):
     search_fields = [
         'order',
         'address',
-        'date',
+        'date_start',
         'counterparty',
         'contact_person']
     

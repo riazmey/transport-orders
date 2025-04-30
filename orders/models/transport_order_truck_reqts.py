@@ -5,7 +5,7 @@ from django.dispatch import receiver
 
 from .transport_order import TransportOrder
 from orders.validators import validate_transport_order_truck_reqts_temperature
-from ws import WSClassifiers
+from ws.classifiers import WSClassifiers
 
 
 class TransportOrderTruckReqts(models.Model):

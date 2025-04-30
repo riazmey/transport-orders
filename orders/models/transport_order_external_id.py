@@ -97,11 +97,11 @@ class TransportOrderExternalID(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['market', 'order', 'external_id'],
-                name='unique_order_per_market')]
+                name='unique_market_order_external_id')]
 
         indexes = [
-            models.Index(fields=['market', 'external_id'], name='market_order_id_idx'),
-            models.Index(fields=['order_id'], name='order_id_idx')]
+            models.Index(fields=['market', 'external_id'], name='market_external_id_idx'),
+            models.Index(fields=['external_id'], name='external_id_idx')]
 
         ordering = ['order', 'market', 'external_code', 'external_id']
         verbose_name = 'Идентификатор заказа'

@@ -13,7 +13,7 @@ class TransportOrderRoutepoint(models.Model):
 
     class Meta:
         indexes = [models.Index(fields=['order'])]
-        ordering = ['order', 'date']
+        ordering = ['order', 'date_start']
         verbose_name = 'Точка маршрута заказа'
         verbose_name_plural = 'Точки маршрутов заказов'
 

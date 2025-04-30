@@ -83,9 +83,10 @@ class TransportOrder(models.Model):
 
 @receiver(pre_save, sender=TransportOrder)
 def update_repr(sender, instance: TransportOrder, **kwargs):
-    new_repr = f'Заказ №{instance.id}'[:255]
-    if instance.repr != new_repr:
-        instance.repr = new_repr
+    if instance.id:
+        new_repr = f'Заказ №{instance.id}'[:255]
+        if instance.repr != new_repr:
+            instance.repr = new_repr
 
 @receiver(pre_save, sender=TransportOrder)
 def update_created(sender, instance: TransportOrder, **kwargs):

@@ -6,7 +6,6 @@ from django.dispatch import receiver
 from django.db import models
 
 from .enum_marketplace_type import EnumMarketplaceType
-from .marketplace_base_ws import MarketplaceBaseWS
 
 
 class Marketplace(models.Model):
@@ -73,8 +72,9 @@ def initialize_ws(sender, instance: Marketplace, **kwargs):
         return
     try:
         name_mixin_class = f'WSMarketplace{instance.type.code_str.title()}'
-        ClassMixIn = getattr(importlib.import_module('ws'), name_mixin_class)
-        MetaClass = type(name_mixin_class, (ClassMixIn, MarketplaceBaseWS), {})
+        ClassMixIn = getattr(importlib.import_module('ws.marketplaces'), name_mixin_class)
+        ClassBase = getattr(importlib.import_module('ws.marketplaces'), 'WSMarketplaceBase')
+        MetaClass = type(name_mixin_class, (ClassMixIn, ClassBase), {})
         instance.ws = MetaClass(instance)
     except Exception as e:
         print(f"Error initializing the MixIn class: {e}")

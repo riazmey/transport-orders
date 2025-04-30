@@ -1,7 +1,7 @@
 
 from django import forms
 from orders.models import TransportOrderCargo
-from ws import WSClassifiers
+from ws.classifiers import WSClassifiers
 
 
 class TransportOrderCargoForm(forms.ModelForm):

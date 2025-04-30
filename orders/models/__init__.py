@@ -6,7 +6,6 @@ from .enum_transport_order_status import EnumTransportOrderStatus
 
 from .counterparty import Counterparty
 from .marketplace import Marketplace
-from .marketplace_base_ws import MarketplaceBaseWS
 
 from .transport_order import TransportOrder
 from .transport_order_truck_reqts import TransportOrderTruckReqts
@@ -22,7 +21,6 @@ __all__ = [
     EnumTransportOrderStatus,
     Counterparty,
     Marketplace,
-    MarketplaceBaseWS,
     TransportOrder,
     TransportOrderTruckReqts,
     TransportOrderTruckReqtsLoadingType,
