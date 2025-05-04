@@ -14,6 +14,7 @@ services:
       - DATABASE_HOST=${DATABASE_HOST}
       - DATABASE_PORT=${DATABASE_PORT}
       - WEB_PORT=${WEB_PORT}
+      - WS_CLASSIFIERS_URL=${WS_CLASSIFIERS_URL}
     networks:
       default:
         ipv4_address: ${NETWORK_IP_APP}
