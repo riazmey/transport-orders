@@ -17,28 +17,28 @@ class Counterparty(models.Model):
         verbose_name_plural = "Контрагенты"
 
     name = models.CharField(
-        max_length=255,
-        default="",
-        blank=False,
-        verbose_name="Наименование (для поиска)")
+        max_length = 255,
+        default = "",
+        blank = False,
+        verbose_name = "Наименование (для поиска)")
 
     name_full = models.CharField(
-        max_length=255,
-        default="",
-        blank=False,
-        verbose_name="Наименование (полное)")
+        max_length = 255,
+        default = "",
+        blank = False,
+        verbose_name = "Наименование (полное)")
 
     inn = models.CharField(
-        max_length=12,
-        default="",
-        blank=False,
-        verbose_name="ИНН")
+        max_length = 12,
+        default = "",
+        blank = False,
+        verbose_name = "ИНН")
 
     kpp = models.CharField(
-        max_length=9,
-        default="",
-        blank=True,
-        verbose_name="КПП")
+        max_length = 9,
+        default = "",
+        blank = True,
+        verbose_name = "КПП")
     
     @property
     def repr(self) -> str:

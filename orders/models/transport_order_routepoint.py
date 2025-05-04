@@ -1,8 +1,5 @@
 
-from datetime import datetime
 from django.db import models
-from django.db.models.signals import pre_save
-from django.dispatch import receiver
 
 from .enum_routepoint_action import EnumRoutepointAction
 from .transport_order import TransportOrder
@@ -12,15 +9,10 @@ class TransportOrderRoutepoint(models.Model):
 
     class Meta:
 
-        constraints = [
-            models.UniqueConstraint(
-                fields=['order', 'address', 'date_start'],
-                name='unique_route_order_addr_date')]
-
         indexes = [
             models.Index(fields=['order'], name='route_order_idx'),
-            models.Index(fields=['order', 'address'], name='route_order_addr_idx'),
-            models.Index(fields=['order', 'address', 'date_start'], name='route_order_addr_date_idx')]
+            models.Index(fields=['order', 'address'], name='route_order_addr_idx')]
+
         ordering = ['order', 'date_start']
         verbose_name = 'Точка маршрута заказа'
         verbose_name_plural = 'Точки маршрутов заказов'
@@ -39,11 +31,13 @@ class TransportOrderRoutepoint(models.Model):
         verbose_name = 'Действие')
 
     date_start = models.DateTimeField(
-        blank = False,
+        blank = True,
+        null = True,
         verbose_name = 'Дата начала действия')
 
     date_end = models.DateTimeField(
-        blank = False,
+        blank = True,
+        null = True,
         verbose_name = 'Дата окончания действия')
 
     address = models.CharField(
@@ -82,22 +76,3 @@ class TransportOrderRoutepoint(models.Model):
 
     def __repr__(self):
         return self.repr
-
-@receiver(pre_save, sender=TransportOrderRoutepoint)
-def update_date(sender, instance: TransportOrderRoutepoint, **kwargs):
-
-    if not instance.date_start:
-        this_day = datetime.today().replace(
-            hour=0,
-            minute=0,
-            second=0,
-            microsecond=0,
-            tzinfo=None)
-        instance.date_start = this_day + datetime.timedelta(days=1)
-
-    if not instance.date_end:
-        instance.date_end = instance.date_start + datetime.timedelta(
-            hours=23,
-            minutes=59,
-            seconds=59,
-            microsecond=999999)

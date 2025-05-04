@@ -32,7 +32,7 @@ class TransportOrder(models.Model):
     counterparty = models.ForeignKey(
         Counterparty,
         on_delete = models.PROTECT,
-        blank = False,
+        blank = True,
         verbose_name = 'Контрагент (заказчик)')
 
     created = models.DateTimeField(

@@ -96,8 +96,8 @@ class WSMarketplaceAtrucks:
         customer_company = data_order.get('customer_company')
         if isinstance(customer_company, dict) | len(customer_company) >= 4:
             return {
-                'inn': customer_company.get('inn', ''),
-                'kpp': customer_company.get('kpp', ''),
+                'inn': cls._value_to_str(customer_company.get('inn')),
+                'kpp': cls._value_to_str(customer_company.get('kpp')),
                 'name': customer_company.get('name', ''),
                 'name_full': customer_company.get('requisite_name', '')}
         else:
@@ -161,8 +161,8 @@ class WSMarketplaceAtrucks:
                     address = data_waypoint.get('address')
                     result.append({
                         'action': cls._convert_data_ws_action(data_waypoint.get('waypoint_type')),
-                        'date_start': parser.parse(arrival_date[0]),
-                        'date_end': parser.parse(arrival_date[1]),
+                        'date_start': cls._value_to_date(arrival_date[0]),
+                        'date_end': cls._value_to_date(arrival_date[1]),
                         'address': address.get('free_form', ''),
                         'counterparty': cls._value_to_str(data_waypoint.get('counteragent', '')),
                         'contact_person': cls._value_to_str(data_waypoint.get('contact_person', '')),
@@ -212,6 +212,15 @@ class WSMarketplaceAtrucks:
             result = str(value)
         elif isinstance(value, float):
             result = str(value)
+        return result
+
+    @classmethod
+    def _value_to_date(cls, value: any) -> datetime | None:
+        result = None
+        if isinstance(value, str):
+            result = parser.parse(value)
+        elif isinstance(value, datetime):
+            result = value
         return result
 
     @classmethod
