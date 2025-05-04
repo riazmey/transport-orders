@@ -11,6 +11,7 @@ from .transport_order_truck_reqts_loading_type import SerializerTransportOrderTr
 from .transport_order_truck_reqts import SerializerTransportOrderTruckReqts
 from .transport_order import SerializerTransportOrder
 from .transport_order import SerializerTransportOrderAPIViewParams
+from .transport_order import SerializerTransportOrdersAPIViewParams
 
 __all__ = [
     SerializerEnumRoutepointAction,
@@ -24,4 +25,5 @@ __all__ = [
     SerializerTransportOrderTruckReqtsLoadingType,
     SerializerTransportOrderTruckReqts,
     SerializerTransportOrder,
-    SerializerTransportOrderAPIViewParams]
+    SerializerTransportOrderAPIViewParams,
+    SerializerTransportOrdersAPIViewParams]

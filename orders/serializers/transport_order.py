@@ -2,6 +2,7 @@
 from rest_framework import serializers
 from orders.models import TransportOrder
 from orders.validators import validate_transport_order_id
+from orders.validators import validate_transport_order_market
 
 from .enum_transport_order_status import SerializerEnumTransportOrderStatus
 from .marketplace import SerializerMarketplace
@@ -44,3 +45,6 @@ class SerializerTransportOrder(serializers.ModelSerializer):
 
 class SerializerTransportOrderAPIViewParams(serializers.Serializer):
     id = serializers.CharField(validators=[validate_transport_order_id])
+
+class SerializerTransportOrdersAPIViewParams(serializers.Serializer):
+    market = serializers.CharField(validators=[validate_transport_order_market])

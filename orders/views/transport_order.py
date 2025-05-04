@@ -2,9 +2,11 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import serializers
+from orders.models import Marketplace
 from orders.models import TransportOrder
 from orders.serializers import SerializerTransportOrder
 from orders.serializers import SerializerTransportOrderAPIViewParams
+from orders.serializers import SerializerTransportOrdersAPIViewParams
 
 
 class TransportOrderAPIView(APIView):
@@ -21,7 +23,12 @@ class TransportOrdersAPIView(APIView):
 
     def get(self, request):
         
-        queryset = TransportOrder.objects.all()
+        params = SerializerTransportOrdersAPIViewParams(data=request.query_params)
+        params.is_valid(raise_exception=True)
+
+        print(f'request.query_params.get(\'market\'): {request.query_params.get('market')}')
+        market = Marketplace.objects.get(id=request.query_params.get('market'))
+        queryset = TransportOrder.objects.filter(market=market)
 
         if queryset:
             return Response(SerializerTransportOrder(queryset, many=True).data)
