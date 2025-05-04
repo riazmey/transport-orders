@@ -24,7 +24,7 @@ RUN echo "Europe/Moscow" > /etc/timezone
 RUN pip install --upgrade pip
 
 WORKDIR /app
-RUN git clone --branch main https://github.com/riazmey/classifiers.git
+RUN git clone --branch main https://github.com/riazmey/transport-orders.git
 
-WORKDIR /app/classifiers
+WORKDIR /app/transport-orders
 RUN pip3 install --no-cache-dir -r requirements.txt
