@@ -166,7 +166,7 @@ class WSMarketplaceAtrucks:
                         'address': address.get('free_form', '')[0:1024],
                         'counterparty': cls._value_to_str(data_waypoint.get('counteragent', ''))[0:255],
                         'contact_person': cls._value_to_str(data_waypoint.get('contact_person', ''))[0:255],
-                        'comment': cls._value_to_str(data_waypoint.get('comment', ''))}[0:1024])
+                        'comment': cls._value_to_str(data_waypoint.get('comment', ''))[0:1024]})
             else:
                 message = 'The "route.waypoints" propertys is missing or incorrectly filled in the received data'
                 raise RequestAborted(message)
