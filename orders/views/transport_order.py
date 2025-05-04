@@ -22,12 +22,19 @@ class TransportOrderAPIView(APIView):
 class TransportOrdersAPIView(APIView):
 
     def get(self, request):
-        
+
+        if request.query_params.get('direct', '').lower() == 'true':
+            direct = True
+        else:
+            direct = False
+
         params = SerializerTransportOrdersAPIViewParams(data=request.query_params)
         params.is_valid(raise_exception=True)
 
-        print(f'request.query_params.get(\'market\'): {request.query_params.get('market')}')
         market = Marketplace.objects.get(id=request.query_params.get('market'))
+        if direct:
+            market.ws.orders_import()
+
         queryset = TransportOrder.objects.filter(market=market)
 
         if queryset:
