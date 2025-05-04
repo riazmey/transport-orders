@@ -4,7 +4,6 @@ from orders.models import TransportOrder
 
 
 def validate_transport_order_id(value: int):
-    order_obj = TransportOrder.objects.get(id=value)
-    if not order_obj:
-        raise ValidationError(f'The logistics order with the identifier {value} was not found')
+    if not TransportOrder.objects.filter(id=value).exists():
+        raise ValidationError(f'The transport order with the identifier {value} was not found')
     return value

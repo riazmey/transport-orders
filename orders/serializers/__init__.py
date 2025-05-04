@@ -4,6 +4,7 @@ from .enum_transport_order_status import SerializerEnumTransportOrderStatus
 from .enum_truck_loading_type import SerializerEnumTruckLoadingType
 from .counterparty import SerializerCounterparty
 from .marketplace import SerializerMarketplace
+from .marketplace import SerializerMarketplaceAPIViewParams
 from .transport_order_cargo import SerializerTransportOrderCargo
 from .transport_order_routepoint import SerializerTransportOrderRoutepoint
 from .transport_order_truck_reqts_loading_type import SerializerTransportOrderTruckReqtsLoadingType
@@ -17,6 +18,7 @@ __all__ = [
     SerializerEnumTruckLoadingType,
     SerializerCounterparty,
     SerializerMarketplace,
+    SerializerMarketplaceAPIViewParams,
     SerializerTransportOrderCargo,
     SerializerTransportOrderRoutepoint,
     SerializerTransportOrderTruckReqtsLoadingType,

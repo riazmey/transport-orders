@@ -18,11 +18,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from orders.views import TransportOrderAPIView
+from orders.views import MarketplaceAPIView
 from orders.views import TransportOrdersAPIView
+from orders.views import TransportOrderAPIView
 
 
 urlpatterns = [
     path("manage/", admin.site.urls),
-    path('api/v1/order/', TransportOrderAPIView.as_view()),
-    path('api/v1/orders/', TransportOrdersAPIView.as_view())]
+    path('api/v1/marketplace/', MarketplaceAPIView.as_view()),
+    path('api/v1/orders/', TransportOrdersAPIView.as_view()),
+    path('api/v1/order/', TransportOrderAPIView.as_view())]
