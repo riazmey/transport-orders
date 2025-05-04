@@ -70,12 +70,6 @@ class TransportOrderRoutepoint(models.Model):
         blank = True,
         verbose_name = 'Комментарий')
 
-    repr = models.CharField(
-        max_length = 255,
-        default = '',
-        blank = True,
-        verbose_name = 'Точка маршрута заказа')
-
     @property
     def repr(self) -> str:
         if self.order:
