@@ -25,5 +25,4 @@ from orders.views import TransportOrdersAPIView
 urlpatterns = [
     path("manage/", admin.site.urls),
     path('api/v1/order/', TransportOrderAPIView.as_view()),
-    path('api/v1/orders/', TransportOrdersAPIView.as_view())
-]
+    path('api/v1/orders/', TransportOrdersAPIView.as_view())]

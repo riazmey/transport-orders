@@ -11,9 +11,9 @@ class EnumTruckLoadingType(models.Model):
 
     code_str = models.CharField(
         max_length = 50,
+        unique = True,
         default = '',
         blank = False,
-        unique = True,
         verbose_name = 'Код (строковый)')
 
     repr = models.CharField(

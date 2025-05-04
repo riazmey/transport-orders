@@ -3,7 +3,7 @@ from rest_framework import serializers
 from orders.models import EnumRoutepointAction
 
 
-class SerializerEnumRoutepointAction(serializers.Serializer):
+class SerializerEnumRoutepointAction(serializers.ModelSerializer):
     
     class Meta:
 

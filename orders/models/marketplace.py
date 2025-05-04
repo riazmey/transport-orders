@@ -1,6 +1,5 @@
 
 import importlib
-from django.db.models.signals import pre_save
 from django.db.models.signals import post_init
 from django.dispatch import receiver
 from django.db import models
@@ -11,6 +10,13 @@ from .enum_marketplace_type import EnumMarketplaceType
 class Marketplace(models.Model):
     
     class Meta:
+        
+        constraints = [
+            models.UniqueConstraint(
+                fields=['type', 'url', 'login'],
+                name='unique_market_type_url_login')]
+        
+        indexes = [models.Index(fields=['type', 'url', 'login'], name='market_type_url_login_idx')]
         verbose_name = 'Площадка'
         verbose_name_plural = 'Площадки'
         ordering = ['type']
@@ -18,7 +24,6 @@ class Marketplace(models.Model):
     type = models.ForeignKey(
         EnumMarketplaceType,
         on_delete = models.PROTECT,
-        db_index = True,
         blank = False,
         verbose_name = 'Тип площадки')
 
@@ -45,25 +50,18 @@ class Marketplace(models.Model):
         blank = True,
         verbose_name = 'Ключ безопасности')
 
-    repr = models.CharField(
-        max_length = 255,
-        default = '',
-        blank = True,
-        verbose_name = 'Площадка')
+    @property
+    def repr(self) -> str:
+        if self.id:
+            return f'{self.type.repr} ({self.url}; {self.login})'[:255]
+        else:
+            return 'Площадка (новая)'
 
     def __str__(self):
         return self.repr
 
     def __repr__(self):
         return self.repr
-
-@receiver(pre_save, sender=Marketplace)
-def update_repr(sender, instance: Marketplace, **kwargs):
-    new_repr = ''
-    if instance:
-        new_repr = f'{instance.type.repr} ({instance.url}; {instance.login})'[:255]
-    if instance.repr != new_repr:
-        instance.repr = new_repr
 
 @receiver(post_init, sender=Marketplace)
 def initialize_ws(sender, instance: Marketplace, **kwargs):

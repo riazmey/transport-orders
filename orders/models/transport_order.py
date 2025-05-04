@@ -4,21 +4,22 @@ from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.utils.timezone import now
 
-from .marketplace import Marketplace
 from .counterparty import Counterparty
 from .enum_transport_order_status import EnumTransportOrderStatus
+from .marketplace import Marketplace
 
 
 class TransportOrder(models.Model):
     
     class Meta:
 
-        indexes = [
-            models.Index(fields=['market']),
-            models.Index(fields=['created']),
-            models.Index(fields=['status'])]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['market', 'counterparty', 'created'],
+                name='unique_transport_order')]
 
-        ordering = ['market', 'created', 'status']
+        indexes = [models.Index(fields=['market', 'counterparty', 'created'], name='transport_order_idx')]
+        ordering = ['created', 'counterparty', 'status']
         verbose_name = 'Заказ'
         verbose_name_plural = 'Заказы'
 
@@ -26,7 +27,13 @@ class TransportOrder(models.Model):
         Marketplace,
         on_delete = models.PROTECT,
         blank = False,
-        verbose_name = 'Торговая площадка')
+        verbose_name = 'Площадка')
+
+    counterparty = models.ForeignKey(
+        Counterparty,
+        on_delete = models.PROTECT,
+        blank = False,
+        verbose_name = 'Контрагент (заказчик)')
 
     created = models.DateTimeField(
         blank = False,
@@ -38,27 +45,19 @@ class TransportOrder(models.Model):
         blank = False,
         verbose_name = 'Статус')
 
-    counterparty = models.ForeignKey(
-        Counterparty,
-        on_delete = models.PROTECT,
-        blank = False,
-        verbose_name = 'Контрагент (заказчик)')
-
     currency = models.CharField(
         max_length = 3,
         default = '',
         blank = False,
         verbose_name = 'Валюта')
  
-    price = models.DecimalField(
+    price = models.FloatField(
         default = 0.00,
-        max_digits = 15,
-        decimal_places = 2,
-        blank = False,
+        blank = True,
         verbose_name = 'Цена')
 
     rate_vat = models.CharField(
-        max_length = 3,
+        max_length = 20,
         default = '',
         blank = False,
         verbose_name = 'Ставка НДС')
@@ -69,24 +68,18 @@ class TransportOrder(models.Model):
         blank = True,
         verbose_name = 'Комментарий')
 
-    repr = models.CharField(
-        max_length = 255,
-        default = '',
-        blank = True,
-        verbose_name = 'Заказ')
+    @property
+    def repr(self) -> str:
+        if self.id:
+            return f'Заказ №{self.id}'
+        else:
+            return 'Заказ (новый)'
 
     def __str__(self):
         return self.repr
 
     def __repr__(self):
         return self.repr
-
-@receiver(pre_save, sender=TransportOrder)
-def update_repr(sender, instance: TransportOrder, **kwargs):
-    if instance.id:
-        new_repr = f'Заказ №{instance.id}'[:255]
-        if instance.repr != new_repr:
-            instance.repr = new_repr
 
 @receiver(pre_save, sender=TransportOrder)
 def update_created(sender, instance: TransportOrder, **kwargs):

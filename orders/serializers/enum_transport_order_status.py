@@ -3,8 +3,8 @@ from rest_framework import serializers
 from orders.models import EnumTransportOrderStatus
 
 
-class SerializerEnumTransportOrderStatus(serializers.Serializer):
-    
+class SerializerEnumTransportOrderStatus(serializers.ModelSerializer):
+
     class Meta:
 
         fields = (

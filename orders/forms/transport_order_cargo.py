@@ -16,7 +16,7 @@ class TransportOrderCargoForm(forms.ModelForm):
         initial = '113'
     )
     hazard_class = forms.ChoiceField(
-        choices = ws.list_hazard_class(),
+        choices = ws.list_cargos_hazards(),
         initial = '0'
     )
 
@@ -33,4 +33,5 @@ class TransportOrderCargoForm(forms.ModelForm):
             'comment']
 
         widgets = {'comment': forms.Textarea()}
+        
         model = TransportOrderCargo

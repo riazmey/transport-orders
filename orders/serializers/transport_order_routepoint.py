@@ -4,16 +4,16 @@ from orders.models import TransportOrderRoutepoint
 from.enum_routepoint_action import SerializerEnumRoutepointAction
 
 
-class SerializerTransportOrderRoutepoint(serializers.Serializer):
+class SerializerTransportOrderRoutepoint(serializers.ModelSerializer):
 
     action = SerializerEnumRoutepointAction()
 
     class Meta:
 
         fields = (
-            'order',
             'action',
-            'date',
+            'date_start',
+            'date_end',
             'address',
             'counterparty',
             'contact_person',

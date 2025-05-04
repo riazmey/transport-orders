@@ -3,7 +3,7 @@ from rest_framework import serializers
 from orders.models import Marketplace
 
 
-class SerializerMarketplace(serializers.Serializer):
+class SerializerMarketplace(serializers.ModelSerializer):
 
     class Meta:
 

@@ -1,9 +1,12 @@
 
 from typing import Tuple
 from django.db import transaction
+from datetime import datetime
 
 from orders.models import(
     EnumTransportOrderStatus,
+    EnumRoutepointAction,
+    Marketplace,
     Counterparty,
     TransportOrder,
     TransportOrderTruckReqts,
@@ -14,70 +17,67 @@ from orders.models import(
 
 class WSMarketplaceBase:
 
-    def __init__(self, market):
+    def __init__(self, market: Marketplace):
         self.market = market
         self.url = market.url
         self.login = market.login
         self.password = market.password
         self.token = market.token
 
-    #@transaction.atomic
+    @transaction.atomic
     def orders_import(self) -> Tuple[list, bool]:
         result = []
         data, success = self.orders_mixin_get()
         if success:
             for order_data in data:
-                result += self._order_update_or_create(order_data)
+                result.append(self._order_update_or_create(order_data))
         return result, success
 
     def orders_mixin_get(self) -> Tuple[list[dict], bool]:
         return [], False
 
     def _order_update_or_create(self, order_data: dict) -> TransportOrder:
-        external_id = order_data.get('external_id')
-        params_external_id = {
-            'market': self.market,
-            'external_id': external_id.get('external_id')}
-        
-        if TransportOrderExternalID.objects.filter(**params_external_id).exists():
-            order_external_id = TransportOrderExternalID.objects.get(**params_external_id)
-            order = self._order_update(order_external_id.order, order_data)
+        counterparty = self._counterparty_update_or_create(order_data.get('counterparty'))
+        created = order_data.get('created')
+        order = self._order_find(order_data, counterparty, created)
+        if order:
+            order.status = EnumTransportOrderStatus.objects.get(code_str=order_data.get('status'))
+            order.currency = order_data.get('currency')
+            order.price = order_data.get('price', 0.00)
+            order.rate_vat = order_data.get('rate_vat')
+            order.save()
         else:
-            order = self._order_create(order_data)
-            
-            print(f'   ORDER: /{order}/')
-            #self._order_external_id_create(order, external_id)
+            order = TransportOrder.objects.create(
+                market = self.market,
+                counterparty = counterparty,
+                created = created,
+                status = EnumTransportOrderStatus.objects.get(code_str=order_data.get('status')),
+                currency = order_data.get('currency'),
+                price = order_data.get('price'),
+                rate_vat = order_data.get('rate_vat'))
         
-        print(f'       order_data: {order_data}')
+        self._order_external_id_create(order, order_data.get('external_id'))
         self._order_cargo_update_or_create(order, order_data.get('cargo'))
         self._order_truck_requirements_update_or_create(order, order_data.get('truck_requirements'))
         self._order_routepoints_update_or_create(order, order_data.get('routepoints'))
 
         return order
 
-    def _order_update(self, order: TransportOrder, order_data: dict) -> TransportOrder:
-        order.market = self.market
-        order.status = EnumTransportOrderStatus.objects.get(code_str=order_data.get('status'))
-        order.counterparty = self._counterparty_update_or_create(order_data.get('counterparty'))
-        order.currency = order_data.get('currency'),
-        order.price = order_data.get('price'),
-        order.rate_vat = order_data.get('rate_vat'),
-        order.save()
-        return order
-
-    def _order_create(self, order_data: dict) -> TransportOrder:
-        return TransportOrder.objects.create(
-            market = self.market,
-            created = order_data.get('created'),
-            status = EnumTransportOrderStatus.objects.get(code_str=order_data.get('status')),
-            counterparty = self._counterparty_update_or_create(order_data.get('counterparty')),
-            currency = order_data.get('currency'),
-            price = order_data.get('price'),
-            rate_vat = order_data.get('rate_vat'))
+    def _order_find(self, order_data: dict, counterparty: Counterparty, created: datetime) -> TransportOrder | None:
+        params_order = {'market': self.market, 'counterparty': counterparty, 'created': created}
+        if TransportOrder.objects.filter(**params_order).exists():
+            return TransportOrder.objects.get(**params_order)
+        else:
+            external_id = order_data.get('external_id')
+            params_external_id = {'market': self.market, 'external_id': external_id.get('external_id')}
+            if TransportOrderExternalID.objects.filter(**params_external_id).exists():
+                order_external_id = TransportOrderExternalID.objects.get(**params_external_id)
+                return order_external_id.order
+            else:
+                return None
 
     def _order_external_id_create(self, order: TransportOrder, external_id_data: dict) -> TransportOrderExternalID:
-        print(f'       external_id: {external_id_data.get('external_id')}')
-        print(f'       external_code: {external_id_data.get('external_code')}')
+        TransportOrderExternalID.objects.filter(market=self.market, order=order).delete()
         return TransportOrderExternalID.objects.create(
             market = self.market,
             order = order,
@@ -87,7 +87,6 @@ class WSMarketplaceBase:
     def _counterparty_update_or_create(self, counterparty_data: dict) -> Counterparty:
         inn = counterparty_data.get('inn')
         kpp = counterparty_data.get('kpp')
-
         counterparty_params = {'inn': inn, 'kpp': kpp}
 
         if Counterparty.objects.filter(**counterparty_params).exists():
@@ -100,19 +99,17 @@ class WSMarketplaceBase:
                 name_full = counterparty_data.get('name_full'))
 
     def _order_cargo_update_or_create(self, order: TransportOrder, cargo_data: list[dict]) -> list[TransportOrderCargo]:
-        print(f'       cargo_data: {cargo_data}')
         result = []
         TransportOrderCargo.objects.filter(order=order).delete()
         for item_data in cargo_data:
-            result += TransportOrderCargo.objects.create(
+            result.append(TransportOrderCargo.objects.create(
                 order = order,
                 name = item_data.get('name'),
-                hazard_class = item_data.get('hazard_class', ''),
+                hazard_class = item_data.get('hazard_class', '0'),
                 weight = item_data.get('weight', 0.0),
                 weight_unit = item_data.get('weight_unit', ''),
                 volume = item_data.get('volume', 0.0),
-                volume_unit = item_data.get('volume_unit', ''),
-                comment = item_data.get('comment', ''))
+                volume_unit = item_data.get('volume_unit', '')))
         return result
 
     def _order_truck_requirements_update_or_create(self, order: TransportOrder, truck_requirements_data: dict) -> TransportOrderTruckReqts:
@@ -132,13 +129,13 @@ class WSMarketplaceBase:
         result = []
         TransportOrderRoutepoint.objects.filter(order=order).delete()
         for item_data in routepoints_data:
-            result += TransportOrderRoutepoint.objects.create(
+            action = EnumRoutepointAction.objects.get(code_str=item_data.get('action'))
+            result.append(TransportOrderRoutepoint.objects.create(
                 order = order,
-                action = EnumTransportOrderStatus.objects.get(code_str=item_data.get('action')),
+                address = item_data.get('address'),
+                action = action,
                 date_start = item_data.get('date_start'),
                 date_end = item_data.get('date_end'),
-                address = item_data.get('address'),
                 counterparty = item_data.get('counterparty', ''),
-                contact_person = item_data.get('contact_person', ''),
-                comment = item_data.get('comment', ''))
+                contact_person = item_data.get('contact_person', '')))
         return result

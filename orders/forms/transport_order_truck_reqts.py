@@ -30,4 +30,5 @@ class TransportOrderTruckReqtsForm(forms.ModelForm):
             'comment']
 
         widgets = {'comment': forms.Textarea()}
+        
         model = TransportOrderTruckReqts

@@ -3,13 +3,13 @@ from rest_framework import serializers
 from orders.models import TransportOrderCargo
 
 
-class SerializerTransportOrderCargo(serializers.Serializer):
+class SerializerTransportOrderCargo(serializers.ModelSerializer):
 
     class Meta:
 
         fields = (
-            'order',
             'name',
+            'hazard_class',
             'weight',
             'weight_unit',
             'volume',

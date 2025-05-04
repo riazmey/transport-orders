@@ -9,25 +9,30 @@ from .counterparty import SerializerCounterparty
 from .transport_order_cargo import SerializerTransportOrderCargo
 from .transport_order_routepoint import SerializerTransportOrderRoutepoint
 from .transport_order_truck_reqts import SerializerTransportOrderTruckReqts
+from .transport_order_external_id import SerializerTransportOrderExternalID
 
 
 class SerializerTransportOrder(serializers.ModelSerializer):
-    market = SerializerMarketplace()
-    status = SerializerEnumTransportOrderStatus()
-    counterparty = SerializerCounterparty()
-    cargo = SerializerTransportOrderCargo(many=True)
-    routepoints = SerializerTransportOrderRoutepoint(many=True)
-    truck_requirements = SerializerTransportOrderTruckReqts()
 
-    class Meta:  
+    market = SerializerMarketplace()
+    counterparty = SerializerCounterparty()
+    status = SerializerEnumTransportOrderStatus()
+    cargo = SerializerTransportOrderCargo(many = True, source = 'order_relate_cargo')
+    routepoints = SerializerTransportOrderRoutepoint(many = True, source = 'order_relate_routepoint')
+    external_ids = SerializerTransportOrderExternalID(many = True, source = 'order_relate_external_id')
+    truck_requirements = SerializerTransportOrderTruckReqts(many = False, source = 'order_relate_truck_requirements')
+
+    class Meta:
 
         fields = (
+            'id',
             'market',
-            'status',
-            'created',
             'counterparty',
+            'created',
+            'status',
             'cargo',
             'routepoints',
+            'external_ids',
             'truck_requirements',
             'currency',
             'price',

@@ -11,7 +11,13 @@ from ws.classifiers import WSClassifiers
 class TransportOrderTruckReqts(models.Model):
     
     class Meta:
-        indexes = [models.Index(fields=['order'])]
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=['order'],
+                name='unique_order_truck_reqts')]
+
+        indexes = [models.Index(fields=['order'], name='order_truck_reqts_idx')]
         ordering = ['order']
         verbose_name = 'Требования к транспорту заказа'
         verbose_name_plural = 'Требования к транспорту заказа'
@@ -19,13 +25,12 @@ class TransportOrderTruckReqts(models.Model):
     order = models.OneToOneField(
         TransportOrder,
         on_delete = models.CASCADE,
+        related_name = 'order_relate_truck_requirements',
         blank = False,
         verbose_name = 'Заказ')
 
-    weight = models.DecimalField(
+    weight = models.FloatField(
         default = 0.000,
-        max_digits = 15,
-        decimal_places = 3,
         blank = False,
         verbose_name = 'Масса')
 
@@ -35,10 +40,8 @@ class TransportOrderTruckReqts(models.Model):
         blank = False,
         verbose_name = 'Единица измерения массы')
 
-    volume = models.DecimalField(
+    volume = models.FloatField(
         default = 0.00,
-        max_digits = 10,
-        decimal_places = 2,
         blank = True,
         verbose_name = 'Объем')
 
@@ -65,38 +68,50 @@ class TransportOrderTruckReqts(models.Model):
         blank = True,
         verbose_name = 'Комментарий')
 
-    repr = models.CharField(
-        max_length = 255,
-        default = '',
-        blank = True,
-        verbose_name = 'Требования к транспорту заказа')
+    @property
+    def repr(self) -> str:
+        repr_weight = f'{self.weight} {self.weight_unit}'
+        repr_volume = ''
+
+        ws = WSClassifiers()
+        weight_unit, success = ws.get_unit(code_dec=self.weight_unit)
+        if success:
+            name = weight_unit.get('name')
+            notation_national = weight_unit.get('notation_national')
+            notation_international = weight_unit.get('notation_international')
+            if notation_national:
+                repr_weight = f'{self.weight} {notation_national}'
+            elif notation_international:
+                repr_weight = f'{self.weight} {notation_international}'
+            elif name:
+                repr_weight = f'{self.weight} {name}'
+            else:
+                repr_weight = f'{self.weight} {self.weight_unit}'
+
+        if self.volume_unit:
+            volume_unit, success = ws.get_unit(code_dec=self.volume_unit)
+            if success:
+                name = volume_unit.get('name')
+                notation_national = volume_unit.get('notation_national')
+                notation_international = volume_unit.get('notation_international')
+                if notation_national:
+                    repr_volume = f'{self.volume} {notation_national}'
+                elif notation_international:
+                    repr_volume = f'{self.volume} {notation_international}'
+                elif name:
+                    repr_volume = f'{self.volume} {name}'
+                else:
+                    repr_volume = f'{self.volume} {self.volume_unit}'
+            else:
+                repr_volume = f'{self.volume} {self.volume_unit}'
+
+        return f'Требования к транспорту {self.order}: {repr_weight}, {repr_volume}'.rstrip()[:255]
 
     def __str__(self):
         return self.repr
 
     def __repr__(self):
         return self.repr
-
-@receiver(pre_save, sender=TransportOrderTruckReqts)
-def update_repr(sender, instance: TransportOrderTruckReqts, **kwargs):
-    repr_weight = f'{instance.weight} {instance.weight_unit}'
-    repr_volume = ''
-
-    weight_unit, success = WSClassifiers.get_unit_by_code_str(code_str=instance.weight_unit)
-    if success:
-        repr_weight = f'{instance.weight} {weight_unit}'
-    
-    if instance.volume_unit:
-        volume_unit, success = WSClassifiers.get_unit_by_code_str(code_str=instance.volume_unit)
-        if success:
-            repr_volume = f'{instance.volume} {volume_unit}'
-        else:
-            repr_volume = f'{instance.volume} {instance.volume_unit}'
-    
-    new_rep = f'{repr_weight} {repr_volume}'.rstrip()[:255]
-
-    if instance.repr != new_rep:
-        instance.repr = new_rep
 
 @receiver(pre_save, sender=TransportOrderTruckReqts)
 def clear_temperature(sender, instance: TransportOrderTruckReqts, **kwargs):

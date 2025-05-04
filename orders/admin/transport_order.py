@@ -6,15 +6,14 @@ from orders.forms import TransportOrderForm
 class TransportOrderAdmin(admin.ModelAdmin):
 
     fields = [
-        ('market', 'status'),
+        'market',
+        ('counterparty', 'status'),
         'created',
-        'counterparty',
         ('price', 'currency'),
         'rate_vat',
         'comment']
 
     list_display = [
-        'market',
         'status',
         'created',
         'counterparty',
@@ -29,14 +28,14 @@ class TransportOrderAdmin(admin.ModelAdmin):
 
     list_filter = [
         'market',
-        'status',
+        'counterparty',
         'created',
-        'counterparty']
+        'status']
 
     ordering = [
         'market',
+        'counterparty',
         'status',
-        'currency',
         'price']
 
     form = TransportOrderForm

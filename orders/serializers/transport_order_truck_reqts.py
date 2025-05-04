@@ -4,21 +4,22 @@ from orders.models import TransportOrderTruckReqts
 from .transport_order_truck_reqts_loading_type import SerializerTransportOrderTruckReqtsLoadingType
 
 
-class SerializerTransportOrderTruckReqts(serializers.Serializer):
+class SerializerTransportOrderTruckReqts(serializers.ModelSerializer):
 
-    loading_types = SerializerTransportOrderTruckReqtsLoadingType()
+    loading_types = SerializerTransportOrderTruckReqtsLoadingType(
+        many = True,
+        source = 'order_truck_reqts_relate_order_truck_reqts_loading_type')
 
     class Meta:
 
         fields = (
-            'order',
             'weight',
             'weight_unit',
             'volume',
             'volume_unit',
             'refrigeration',
             'temperature',
-            'loading_types'
+            'loading_types',
             'comment',
             'repr')
         

@@ -3,7 +3,7 @@ from rest_framework import serializers
 from orders.models import EnumTruckLoadingType
 
 
-class SerializerEnumTruckLoadingType(serializers.Serializer):
+class SerializerEnumTruckLoadingType(serializers.ModelSerializer):
     
     class Meta:
 

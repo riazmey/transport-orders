@@ -1,8 +1,10 @@
 
 import json
 import requests
+from decimal import Decimal
 from datetime import datetime
 from dateutil import parser
+from dateutil import tz
 from typing import Any, Dict, Tuple
 from django.core.exceptions import RequestAborted
 
@@ -62,8 +64,6 @@ class WSMarketplaceAtrucks:
     def _convert_data_ws_order_external_id(cls, data_order: dict) -> dict:
         order_id = data_order.get('order_id', '')
         order_human_name = data_order.get('order_human_name', '')
-        print(f'    order_id: {order_id}')
-        print(f'    order_human_name: {order_human_name}')
         if order_id:
             return {
                 'external_id': order_id,
@@ -86,7 +86,7 @@ class WSMarketplaceAtrucks:
     def _convert_data_ws_order_created(cls, data_order: dict) -> datetime:
         modification_timestamp = data_order.get('modification_timestamp', 0)
         if modification_timestamp:
-            return datetime.fromtimestamp(modification_timestamp)
+            return datetime.fromtimestamp(modification_timestamp).astimezone(tz.tzutc())
         else:
             message = 'The received data is missing the "modification_timestamp" property'
             raise RequestAborted(message)
@@ -112,6 +112,7 @@ class WSMarketplaceAtrucks:
         if isinstance(cargo, dict) | len(cargo) >= 3:
             result.append({
                 'name': cargo.get('name', ''),
+                'hazard_class': cls._value_to_str(cargo.get('hazard_class', '0')),
                 'weight': cls._value_to_float(cargo.get('weight')),
                 'weight_unit': '168',
                 'volume': cls._value_to_float(cargo.get('volume')),
@@ -180,13 +181,10 @@ class WSMarketplaceAtrucks:
         vat_type = ''
         start_price_vat_type = cls._value_to_str(data_order.get('start_price_vat_type'))
         current_price_vat_type = cls._value_to_str(data_order.get('current_price_vat_type'))
-        print(f'     start_price_vat_type: {start_price_vat_type}')
-        print(f'     current_price_vat_type: {current_price_vat_type}')
         if current_price_vat_type:
             vat_type = current_price_vat_type
         elif start_price_vat_type:
             vat_type = start_price_vat_type
-        print(f'     vat_type: {vat_type}')
         rate_vat = cls._convert_data_ws_rate_vat(vat_type)
         if rate_vat:
             return rate_vat
@@ -196,7 +194,7 @@ class WSMarketplaceAtrucks:
 
     @classmethod
     def _value_to_float(cls, value: any) -> float:
-        result = 0.0
+        result = 0.00
         if isinstance(value, float):
             result = value
         elif isinstance(value, int):

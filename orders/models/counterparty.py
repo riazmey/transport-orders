@@ -1,7 +1,5 @@
 
 from django.db import models
-from django.db.models.signals import pre_save
-from django.dispatch import receiver
 
 
 class Counterparty(models.Model):
@@ -13,7 +11,7 @@ class Counterparty(models.Model):
                 fields=['inn', 'kpp'],
                 name='unique_inn_per_kpp')]
 
-        indexes = [models.Index(fields=['inn', 'kpp'])]
+        indexes = [models.Index(fields=['inn', 'kpp'], name='inn_kpp_idx')]
         ordering = ["name"]
         verbose_name = "Контрагент"
         verbose_name_plural = "Контрагенты"
@@ -42,11 +40,12 @@ class Counterparty(models.Model):
         blank=True,
         verbose_name="КПП")
     
-    repr = models.CharField(
-        max_length=255,
-        default="",
-        blank=True,
-        verbose_name="Контрагент")
+    @property
+    def repr(self) -> str:
+        if self.id:
+            return f'{self.name} ({self.inn}/{self.kpp})'[:255]
+        else:
+            return 'Контрагент (новый)'
 
     def __str__(self):
         return self.repr
@@ -58,9 +57,3 @@ class Counterparty(models.Model):
         if isinstance(value, str):
             return self.name == value
         return super().__eq__(value)
-
-@receiver(pre_save, sender=Counterparty)
-def update_repr(sender, instance: Counterparty , **kwargs):
-    new_repr = f'{instance.name} ({instance.inn}/{instance.kpp})'[:255]
-    if instance.repr != new_repr:
-        instance.repr = new_repr
