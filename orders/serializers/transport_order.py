@@ -29,7 +29,7 @@ class SerializerTransportOrder(serializers.ModelSerializer):
             'id',
             'market',
             'counterparty',
-            'created',
+            'modified',
             'status',
             'cargo',
             'routepoints',

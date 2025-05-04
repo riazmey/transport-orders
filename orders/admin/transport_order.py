@@ -8,14 +8,14 @@ class TransportOrderAdmin(admin.ModelAdmin):
     fields = [
         'market',
         ('counterparty', 'status'),
-        'created',
+        'modified',
         ('price', 'currency'),
         'rate_vat',
         'comment']
 
     list_display = [
         'status',
-        'created',
+        'modified',
         'counterparty',
         'price',
         'currency',
@@ -29,7 +29,7 @@ class TransportOrderAdmin(admin.ModelAdmin):
     list_filter = [
         'market',
         'counterparty',
-        'created',
+        'modified',
         'status']
 
     ordering = [

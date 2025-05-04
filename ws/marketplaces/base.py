@@ -38,9 +38,10 @@ class WSMarketplaceBase:
 
     def _order_update_or_create(self, order_data: dict) -> TransportOrder:
         counterparty = self._counterparty_update_or_create(order_data.get('counterparty'))
-        created = order_data.get('created')
-        order = self._order_find(order_data, counterparty, created)
+        order = self._order_find(order_data)
         if order:
+            order.counterparty = counterparty,
+            order.modified = order_data.get('modified'),
             order.status = EnumTransportOrderStatus.objects.get(code_str=order_data.get('status'))
             order.currency = order_data.get('currency')
             order.price = order_data.get('price', 0.00)
@@ -50,7 +51,7 @@ class WSMarketplaceBase:
             order = TransportOrder.objects.create(
                 market = self.market,
                 counterparty = counterparty,
-                created = created,
+                modified = order_data.get('modified'),
                 status = EnumTransportOrderStatus.objects.get(code_str=order_data.get('status')),
                 currency = order_data.get('currency'),
                 price = order_data.get('price'),
@@ -63,18 +64,14 @@ class WSMarketplaceBase:
 
         return order
 
-    def _order_find(self, order_data: dict, counterparty: Counterparty, created: datetime) -> TransportOrder | None:
-        params_order = {'market': self.market, 'counterparty': counterparty, 'created': created}
-        if TransportOrder.objects.filter(**params_order).exists():
-            return TransportOrder.objects.get(**params_order)
+    def _order_find(self, order_data: dict) -> TransportOrder | None:
+        external_id = order_data.get('external_id')
+        params_external_id = {'market': self.market, 'external_id': external_id.get('external_id')}
+        if TransportOrderExternalID.objects.filter(**params_external_id).exists():
+            order_external_id = TransportOrderExternalID.objects.get(**params_external_id)
+            return order_external_id.order
         else:
-            external_id = order_data.get('external_id')
-            params_external_id = {'market': self.market, 'external_id': external_id.get('external_id')}
-            if TransportOrderExternalID.objects.filter(**params_external_id).exists():
-                order_external_id = TransportOrderExternalID.objects.get(**params_external_id)
-                return order_external_id.order
-            else:
-                return None
+            return None
 
     def _order_external_id_create(self, order: TransportOrder, external_id_data: dict) -> TransportOrderExternalID:
         TransportOrderExternalID.objects.filter(market=self.market, order=order).delete()

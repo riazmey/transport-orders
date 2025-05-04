@@ -20,7 +20,7 @@ class TransportOrderForm(forms.ModelForm):
         
         fields = [
             'counterparty',
-            'created',
+            'modified',
             'status',
             'price',
             'currency',

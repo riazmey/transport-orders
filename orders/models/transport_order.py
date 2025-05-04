@@ -12,14 +12,8 @@ from .marketplace import Marketplace
 class TransportOrder(models.Model):
     
     class Meta:
-
-        constraints = [
-            models.UniqueConstraint(
-                fields=['market', 'counterparty', 'created'],
-                name='unique_transport_order')]
-
-        indexes = [models.Index(fields=['market', 'counterparty', 'created'], name='transport_order_idx')]
-        ordering = ['created', 'counterparty', 'status']
+        indexes = [models.Index(fields=['market'], name='transport_order_market_idx')]
+        ordering = ['modified', 'counterparty', 'status']
         verbose_name = 'Заказ'
         verbose_name_plural = 'Заказы'
 
@@ -35,9 +29,9 @@ class TransportOrder(models.Model):
         blank = True,
         verbose_name = 'Контрагент (заказчик)')
 
-    created = models.DateTimeField(
+    modified = models.DateTimeField(
         blank = False,
-        verbose_name = 'Дата создания')
+        verbose_name = 'Дата изменения')
 
     status = models.ForeignKey(
         EnumTransportOrderStatus,
@@ -83,5 +77,5 @@ class TransportOrder(models.Model):
 
 @receiver(pre_save, sender=TransportOrder)
 def update_created(sender, instance: TransportOrder, **kwargs):
-    if not instance.created:
-        instance.created = now
+    if not instance.modified:
+        instance.modified = now

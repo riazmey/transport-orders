@@ -50,7 +50,7 @@ class WSMarketplaceAtrucks:
         
         return {
             'external_id': cls._convert_data_ws_order_external_id(data_order),
-            'created': cls._convert_data_ws_order_created(data_order),
+            'modified': cls._convert_data_ws_order_modified(data_order),
             'status': cls._convert_data_ws_order_status_code(data_order),
             'counterparty': cls._convert_data_ws_order_counterparty(data_order),
             'cargo': cls._convert_data_ws_order_cargo(data_order),
@@ -83,7 +83,7 @@ class WSMarketplaceAtrucks:
             raise RequestAborted(message)
 
     @classmethod
-    def _convert_data_ws_order_created(cls, data_order: dict) -> datetime:
+    def _convert_data_ws_order_modified(cls, data_order: dict) -> datetime:
         modification_timestamp = data_order.get('modification_timestamp', 0)
         if modification_timestamp:
             return datetime.fromtimestamp(modification_timestamp).astimezone(tz.tzutc())
