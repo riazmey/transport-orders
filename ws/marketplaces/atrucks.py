@@ -62,8 +62,8 @@ class WSMarketplaceAtrucks:
 
     @classmethod
     def _convert_data_ws_order_external_id(cls, data_order: dict) -> dict:
-        order_id = data_order.get('order_id', '')
-        order_human_name = data_order.get('order_human_name', '')
+        order_id = data_order.get('order_id', '')[0:40]
+        order_human_name = data_order.get('order_human_name', '')[0:40]
         if order_id:
             return {
                 'external_id': order_id,
@@ -74,7 +74,7 @@ class WSMarketplaceAtrucks:
 
     @classmethod
     def _convert_data_ws_order_status_code(cls, data_order: dict) -> str:
-        status = data_order.get('status', '')
+        status = data_order.get('status', '')[0:50]
         status_code = cls._convert_data_ws_status_code(status)
         if status_code:
             return status_code
@@ -96,10 +96,10 @@ class WSMarketplaceAtrucks:
         customer_company = data_order.get('customer_company')
         if isinstance(customer_company, dict) | len(customer_company) >= 4:
             return {
-                'inn': cls._value_to_str(customer_company.get('inn')),
-                'kpp': cls._value_to_str(customer_company.get('kpp')),
-                'name': customer_company.get('name', ''),
-                'name_full': customer_company.get('requisite_name', '')}
+                'inn': cls._value_to_str(customer_company.get('inn'))[0:12],
+                'kpp': cls._value_to_str(customer_company.get('kpp'))[0:9],
+                'name': customer_company.get('name', '')[0:255],
+                'name_full': customer_company.get('requisite_name', '')[0:255]}
         else:
             message = 'The "customer_company" property is missing or incorrectly filled in the received data'
             raise RequestAborted(message)
@@ -111,8 +111,8 @@ class WSMarketplaceAtrucks:
         cargo = data_order.get('cargo')
         if isinstance(cargo, dict) | len(cargo) >= 3:
             result.append({
-                'name': cargo.get('name', ''),
-                'hazard_class': cls._value_to_str(cargo.get('hazard_class', '0')),
+                'name': cargo.get('name', '')[0:150],
+                'hazard_class': cls._value_to_str(cargo.get('hazard_class', '0'))[0:5],
                 'weight': cls._value_to_float(cargo.get('weight')),
                 'weight_unit': '168',
                 'volume': cls._value_to_float(cargo.get('volume')),
@@ -144,7 +144,7 @@ class WSMarketplaceAtrucks:
                 'volume_unit': '113',
                 'refrigeration': refrigeration,
                 'temperature': temperature,
-                'comment': truck.get('carrying_description', '')}
+                'comment': truck.get('carrying_description', '')[0:1024]}
         else:
             message = 'The "truck" property is missing or incorrectly filled in the received data'
             raise RequestAborted(message)
@@ -160,13 +160,13 @@ class WSMarketplaceAtrucks:
                     arrival_date = data_waypoint.get('arrival_date')
                     address = data_waypoint.get('address')
                     result.append({
-                        'action': cls._convert_data_ws_action(data_waypoint.get('waypoint_type')),
+                        'action': cls._convert_data_ws_action(data_waypoint.get('waypoint_type')[0:50]),
                         'date_start': cls._value_to_date(arrival_date[0]),
                         'date_end': cls._value_to_date(arrival_date[1]),
-                        'address': address.get('free_form', ''),
-                        'counterparty': cls._value_to_str(data_waypoint.get('counteragent', '')),
-                        'contact_person': cls._value_to_str(data_waypoint.get('contact_person', '')),
-                        'comment': cls._value_to_str(data_waypoint.get('comment', ''))})
+                        'address': address.get('free_form', '')[0:1024],
+                        'counterparty': cls._value_to_str(data_waypoint.get('counteragent', ''))[0:255],
+                        'contact_person': cls._value_to_str(data_waypoint.get('contact_person', ''))[0:255],
+                        'comment': cls._value_to_str(data_waypoint.get('comment', ''))}[0:1024])
             else:
                 message = 'The "route.waypoints" propertys is missing or incorrectly filled in the received data'
                 raise RequestAborted(message)
