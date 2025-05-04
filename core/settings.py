@@ -66,23 +66,23 @@ if use_vars_env:
     }
 else:
     DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
 
 # Connection settings for web services
 if use_vars_env:
     WEB_SERVICES = {
-        "classifiers": {
-            "URL": getenv('WS_CLASSIFIERS_URL', 'http://127.0.0.1:8000'),
+        'classifiers': {
+            'URL': getenv('WS_CLASSIFIERS_URL', 'http://127.0.0.1:8000'),
         }
     }
 else:
     WEB_SERVICES = {
-        "classifiers": {
-            "URL": "http://127.0.0.1:8100",
+        'classifiers': {
+            'URL': 'http://127.0.0.1:8100',
         }
     }
 
@@ -95,8 +95,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "orders.apps.OrdersConfig",
-    "rest_framework",
+    'orders.apps.OrdersConfig',
+    'rest_framework',
+    'django_crontab'
 ]
 
 MIDDLEWARE = [
@@ -177,3 +178,7 @@ REST_FRAMEWORK = {
         'rest_framework.renders.BrowsableAPIRenderer',
     ]
 }
+
+CRONJOBS = [
+    ('* * * * *', 'orders.tasks.orders_import')
+]
