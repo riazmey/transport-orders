@@ -29,7 +29,6 @@ class WSMarketplaceBase:
         result = []
         data, success = self.orders_mixin_get()
         if success:
-            print(f'get data: {data}')
             for order_data in data:
                 result.append(self._order_update_or_create(order_data))
         return result, success
