@@ -97,7 +97,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'orders.apps.OrdersConfig',
     'rest_framework',
-    'django_crontab'
 ]
 
 MIDDLEWARE = [
@@ -178,7 +177,3 @@ REST_FRAMEWORK = {
         'rest_framework.renders.BrowsableAPIRenderer',
     ]
 }
-
-CRONJOBS = [
-    ('* * * * *', 'orders.tasks.orders_import')
-]
