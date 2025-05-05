@@ -39,13 +39,13 @@ class WSMarketplaceBase:
         counterparty = self._counterparty_update_or_create(order_data.get('counterparty'))
         order = self._order_find(order_data)
         if order:
-            order.counterparty = counterparty,
-            order.modified = order_data.get('modified'),
-            order.status = EnumTransportOrderStatus.objects.get(code_str=order_data.get('status'))
-            order.currency = order_data.get('currency')
-            order.price = order_data.get('price', 0.00)
-            order.rate_vat = order_data.get('rate_vat')
-            order.save()
+            TransportOrder.objects.filter(pk=order.pk).update(
+                counterparty = counterparty,
+                modified = order_data.get('modified'),
+                status = EnumTransportOrderStatus.objects.get(code_str=order_data.get('status')),
+                currency = order_data.get('currency'),
+                price = order_data.get('price', 0.00),
+                rate_vat = order_data.get('rate_vat'))
         else:
             order = TransportOrder.objects.create(
                 market = self.market,
@@ -86,7 +86,7 @@ class WSMarketplaceBase:
         counterparty_params = {'inn': inn, 'kpp': kpp}
 
         if Counterparty.objects.filter(**counterparty_params).exists():
-            return Counterparty.objects.get(inn=inn, kpp=kpp)
+            return Counterparty.objects.get(**counterparty_params)
         else:
             return Counterparty.objects.create(
                 inn = inn,
