@@ -3,6 +3,7 @@ from rest_framework import serializers
 from orders.models import TransportOrder
 from orders.validators import validate_transport_order_id
 from orders.validators import validate_transport_order_market
+from ws.classifiers import WSClassifiers
 
 from .enum_transport_order_status import SerializerEnumTransportOrderStatus
 from .marketplace import SerializerMarketplace
@@ -22,6 +23,22 @@ class SerializerTransportOrder(serializers.ModelSerializer):
     routepoints = SerializerTransportOrderRoutepoint(many = True, source = 'order_relate_routepoint')
     external_ids = SerializerTransportOrderExternalID(many = True, source = 'order_relate_external_id')
     truck_requirements = SerializerTransportOrderTruckReqts(many = False, source = 'order_relate_truck_requirements')
+    currency = serializers.SerializerMethodField()
+    rate_vat = serializers.SerializerMethodField()
+
+    def get_currency(self, data) -> dict:
+        data_currency, recieved = WSClassifiers().get_currency({'code_str': data.currency})
+        if recieved:
+            return data_currency
+        else:
+            return {}
+
+    def get_rate_vat(self, data) -> dict:
+        data_rate_vat, recieved = WSClassifiers().get_rate_vat({'code_str': data.rate_vat})
+        if recieved:
+            return data_rate_vat
+        else:
+            return {}
 
     class Meta:
 

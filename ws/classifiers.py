@@ -68,14 +68,11 @@ class WSClassifiers:
     def get_currencies(self) -> Tuple[Any, bool]:
         return self._request(requests.get, self.URNs.currencies)
 
-    def get_unit(self, code_dec: str) -> Tuple[Any, bool]:
-        return self._request(requests.get, self.URNs.unit, {'code_dec': code_dec})
+    def get_unit(self, params: Dict) -> Tuple[Any, bool]:
+        return self._request(requests.get, self.URNs.unit, params)
 
     def get_units(self, params: Dict) -> Tuple[Any, bool]:
         return self._request(requests.get, self.URNs.units, params)
-
-    def get_rate_vat(self, params: Dict = None) -> Tuple[Any, bool]:
-        return self._request(requests.get, self.URNs.rate_vat, params)
 
     def get_cargo_hazard(self, params: Dict = None) -> Tuple[Any, bool]:
         return self._request(requests.get, self.URNs.cargo_hazard, params)
@@ -85,6 +82,9 @@ class WSClassifiers:
 
     def get_cargos_hazards(self) -> Tuple[Any, bool]:
         return self._request(requests.get, self.URNs.cargos_hazards)
+
+    def get_rate_vat(self, params: Dict) -> Tuple[Any, bool]:
+        return self._request(requests.get, self.URNs.rate_vat, params)
 
     def get_rates_vat(self) -> Tuple[Any, bool]:
         return self._request(requests.get, self.URNs.rates_vat)

@@ -3,5 +3,4 @@ django
 psycopg2-binary
 djangorestframework
 django-environ
-django-crontab
 requests

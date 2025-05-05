@@ -8,14 +8,14 @@ from ws.classifiers import WSClassifiers
 class TransportOrderTruckReqtsForm(forms.ModelForm):
 
     ws = WSClassifiers()
+    
     weight_unit = forms.ChoiceField(
         choices = ws.list_units({'type':'weight'}),
-        initial = '168'
-    )
+        initial = '168')
+
     volume_unit = forms.ChoiceField(
         choices = ws.list_units({'type':'volume'}),
-        initial = '113'
-    )
+        initial = '113')
 
     class Meta:
 

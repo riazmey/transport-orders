@@ -14,7 +14,7 @@ class TransportOrderForm(forms.ModelForm):
 
     rate_vat = forms.ChoiceField(
         choices = ws.list_rates_vat(),
-        initial = 'RUB')
+        initial = 'with_vat20')
 
     class Meta:
         
