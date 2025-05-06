@@ -22,9 +22,12 @@ RUN echo "Europe/Moscow" > /etc/timezone
 
 # Upgrade python-pip
 RUN pip install --upgrade pip
+RUN pip install gunicorn
 
 WORKDIR /app
 RUN git clone --branch main https://github.com/riazmey/transport-orders.git
 
 WORKDIR /app/transport-orders
 RUN pip3 install --no-cache-dir -r requirements.txt
+
+CMD ["/bin/bash", "/app/classifiers/entrypoint-app.sh"]

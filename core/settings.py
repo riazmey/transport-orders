@@ -177,3 +177,10 @@ REST_FRAMEWORK = {
         'rest_framework.renders.BrowsableAPIRenderer',
     ]
 }
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'cache',
+    }
+} # python manage.py createcachetable

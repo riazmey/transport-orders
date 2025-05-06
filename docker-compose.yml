@@ -29,7 +29,6 @@ services:
         type: bind
         bind:
           create_host_path: true
-    command: python /app/transport-orders/manage.py runserver 0.0.0.0:${WEB_PORT}
     healthcheck:
       test: [ 'CMD-SHELL', 'curl --fail http://docker.ltlog.local:${WEB_PORT}/manage || exit 1' ]
       interval: 10s
