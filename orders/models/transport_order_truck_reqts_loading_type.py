@@ -1,6 +1,8 @@
 
 from django.db import models
 from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.core.cache import cache
 
 from .enum_truck_loading_type import EnumTruckLoadingType
 from .transport_order_truck_reqts import TransportOrderTruckReqts
@@ -46,6 +48,6 @@ class TransportOrderTruckReqtsLoadingType(models.Model):
     def __repr__(self):
         return self.repr
 
-@receiver(post_save, sender=TransportOrder)
-def clear_cache(sender, instance: TransportOrder, **kwargs):
+@receiver(post_save, sender=TransportOrderTruckReqtsLoadingType)
+def clear_cache(sender, instance: TransportOrderTruckReqtsLoadingType, **kwargs):
     cache.clear()
