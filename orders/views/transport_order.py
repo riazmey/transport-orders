@@ -8,6 +8,12 @@ from orders.serializers import SerializerTransportOrder
 from orders.serializers import SerializerTransportOrderAPIViewParams
 from orders.serializers import SerializerTransportOrdersAPIViewParams
 
+from orders.multithreading import MultithreadedDataProcessing
+
+
+def handler_serialize_transport_orders(data: list, queue):
+    result = SerializerTransportOrder(data, many=True).data
+    queue.put(result)
 
 class TransportOrderAPIView(APIView):
 
@@ -38,7 +44,10 @@ class TransportOrdersAPIView(APIView):
         queryset = TransportOrder.objects.filter(market=market)
 
         if queryset:
-            return Response(SerializerTransportOrder(queryset, many=True).data)
+            serialized_data = MultithreadedDataProcessing(
+                handler = handler_serialize_transport_orders,
+                data = queryset).processing()
+            return Response(serialized_data)
         else:
             message = 'Couldn\'t find a transport orders'
             raise serializers.ValidationError(message)
