@@ -1,6 +1,8 @@
 
+from django.core.cache import cache
+
 from django.db import models
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from django.utils.timezone import now
 
@@ -79,3 +81,7 @@ class TransportOrder(models.Model):
 def update_created(sender, instance: TransportOrder, **kwargs):
     if not instance.modified:
         instance.modified = now
+
+@receiver(post_save, sender=TransportOrder)
+def clear_cache(sender, instance: TransportOrder, **kwargs):
+    cache.clear()
