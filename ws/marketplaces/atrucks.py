@@ -231,11 +231,23 @@ class WSMarketplaceAtrucks:
                 result = 'draft'
             case 'auction':
                 result = 'auction'
+            case 'bundle_auction':
+                result = 'auction'
+            case 'in_bundle_auction':
+                result = 'auction'
             case 'no_data':
+                result = 'waiting_start'
+            case 'in_bundle_no_data':
+                result = 'waiting_start'
+            case 'bundle_assigned':
                 result = 'waiting_start'
             case 'in_progress':
                 result = 'in_progress'
+            case 'in_bundle_in_progress':
+                result = 'in_progress'
             case 'completed':
+                result = 'completed'
+            case 'in_bundle_completed':
                 result = 'completed'
         return result
     
