@@ -56,12 +56,10 @@ class MultithreadedDataProcessing():
 
         data_thread = None
         for i in range(1, num_items + 1):
-            print(f'i: {i}')
             if not data_thread:
                 data_thread = []
             data_thread.append(data[i - 1])
             if (i // items_per_thread) == (i / items_per_thread) or i == num_items + 1:
-                print(f'    Tread.len(): {len(data_thread)}')
                 result.append(Thread(
                     target=handler,
                     args=(data_thread, self.queue)))
