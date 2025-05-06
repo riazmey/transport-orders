@@ -98,8 +98,8 @@ class WSMarketplaceAtrucks:
             return {
                 'inn': cls._value_to_str(customer_company.get('inn'))[0:12],
                 'kpp': cls._value_to_str(customer_company.get('kpp'))[0:9],
-                'name': customer_company.get('name', '')[0:255],
-                'name_full': customer_company.get('requisite_name', '')[0:255]}
+                'name': cls._value_to_str(customer_company.get('name', ''))[0:255],
+                'name_full': cls._value_to_str(customer_company.get('requisite_name', ''))[0:255]}
         else:
             message = 'The "customer_company" property is missing or incorrectly filled in the received data'
             raise RequestAborted(message)
