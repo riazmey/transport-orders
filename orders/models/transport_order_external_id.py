@@ -1,5 +1,6 @@
 
 from django.db import models
+from django.db.models.signals import post_save
 
 from .marketplace import Marketplace
 from .transport_order import TransportOrder
@@ -59,3 +60,7 @@ class TransportOrderExternalID(models.Model):
 
     def __repr__(self):
         return self.repr
+
+@receiver(post_save, sender=TransportOrder)
+def clear_cache(sender, instance: TransportOrder, **kwargs):
+    cache.clear()

@@ -1,6 +1,6 @@
 
 from django.db import models
-from django.db.models.signals import pre_save
+from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 
 from .transport_order import TransportOrder
@@ -117,3 +117,7 @@ class TransportOrderTruckReqts(models.Model):
 def clear_temperature(sender, instance: TransportOrderTruckReqts, **kwargs):
     if not instance.refrigeration:
         instance.temperature = 0
+
+@receiver(post_save, sender=TransportOrder)
+def clear_cache(sender, instance: TransportOrder, **kwargs):
+    cache.clear()

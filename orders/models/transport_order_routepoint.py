@@ -1,5 +1,6 @@
 
 from django.db import models
+from django.db.models.signals import post_save
 
 from .enum_routepoint_action import EnumRoutepointAction
 from .transport_order import TransportOrder
@@ -76,3 +77,7 @@ class TransportOrderRoutepoint(models.Model):
 
     def __repr__(self):
         return self.repr
+
+@receiver(post_save, sender=TransportOrder)
+def clear_cache(sender, instance: TransportOrder, **kwargs):
+    cache.clear()
