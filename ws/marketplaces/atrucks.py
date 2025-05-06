@@ -259,6 +259,8 @@ class WSMarketplaceAtrucks:
                 result = 'loading'
             case 'unload':
                 result = 'unloading'
+            case 'check':
+                result = 'check'
         return result
 
     @classmethod

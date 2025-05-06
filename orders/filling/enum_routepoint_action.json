@@ -1,4 +1,5 @@
 [
 	{"code_str": "loading", "repr": "Загрузка"},
-	{"code_str": "unloading", "repr": "Разгрузка"}
+	{"code_str": "unloading", "repr": "Разгрузка"},
+	{"code_str": "check", "repr": "Проверка"}
 ]

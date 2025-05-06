@@ -5,7 +5,7 @@
 !**/migrations/__init__.py
 
 # DB
-*.sqlite3
+*.sqlite3*
 
 # Python
 __pycache__
