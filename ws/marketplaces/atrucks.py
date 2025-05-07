@@ -184,8 +184,7 @@ class WSMarketplaceAtrucks:
         elif data_order_start_price:
             return data_order_start_price
         else:
-            message = 'The "price, start_price" propertys is missing or incorrectly filled in the received data'
-            raise RequestAborted(message)
+            return 0.0
 
     @classmethod
     def _convert_data_ws_order_rate_vat(cls, data_order: dict) -> str:
