@@ -35,8 +35,6 @@ class TransportOrderAPIView(APIView):
 
 class TransportOrdersAPIView(APIView):
 
-    @method_decorator(cache_page(60 * 60 * 2))
-    @method_decorator(vary_on_cookie)
     def get(self, request):
 
         if request.query_params.get('direct', '').lower() == 'true':
@@ -46,14 +44,16 @@ class TransportOrdersAPIView(APIView):
 
         params = SerializerTransportOrdersAPIViewParams(data=request.query_params)
         params.is_valid(raise_exception=True)
-
+        
         market = Marketplace.objects.get(id=request.query_params.get('market'))
-
         if direct:
             market.ws.orders_import()
+        return self._get_serialize_data(market)
 
+    @method_decorator(cache_page(60 * 60 * 2))
+    @method_decorator(vary_on_cookie)
+    def _get_serialize_data(self, market):
         queryset = TransportOrder.objects.filter(market=market)
-
         if queryset:
             serialized_data = MultithreadedDataProcessing(
                 handler = handler_serialize_transport_orders,
