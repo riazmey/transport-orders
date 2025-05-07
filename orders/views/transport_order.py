@@ -6,6 +6,7 @@ from rest_framework import serializers
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.views.decorators.vary import vary_on_cookie
+from django.core.cache import cache
 
 from orders.models import Marketplace
 from orders.models import TransportOrder
@@ -48,17 +49,21 @@ class TransportOrdersAPIView(APIView):
         market = Marketplace.objects.get(id=request.query_params.get('market'))
         if direct:
             market.ws.orders_import()
-        return self._get_serialize_data(market)
+        return Response(self._get_serialized_data(market))
 
-    @method_decorator(cache_page(60 * 60 * 2))
-    @method_decorator(vary_on_cookie)
-    def _get_serialize_data(self, market):
-        queryset = TransportOrder.objects.filter(market=market)
-        if queryset:
-            serialized_data = MultithreadedDataProcessing(
-                handler = handler_serialize_transport_orders,
-                data = queryset).processing()
-            return Response(serialized_data)
+    def _get_serialized_data(self, market: Marketplace) -> list[dict]:
+        key_cache = f'TransportOrdersAPIView._get_serialize_data(market={market.pk})'
+        result = cache.get(key_cache)
+        if result:
+            return result
         else:
-            message = 'Couldn\'t find a transport orders'
-            raise serializers.ValidationError(message)
+            queryset = TransportOrder.objects.filter(market=market)
+            if queryset:
+                result = MultithreadedDataProcessing(
+                    handler = handler_serialize_transport_orders,
+                    data = queryset).processing()
+                cache.set(key_cache, result, 60 * 60 * 2)
+                return result
+            else:
+                message = 'Couldn\'t find a transport orders'
+                raise serializers.ValidationError(message)
