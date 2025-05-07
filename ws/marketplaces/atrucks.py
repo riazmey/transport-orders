@@ -47,7 +47,6 @@ class WSMarketplaceAtrucks:
 
     @classmethod
     def _convert_data_ws_order(cls, data_order: dict) -> dict:
-        
         return {
             'external_id': cls._convert_data_ws_order_external_id(data_order),
             'modified': cls._convert_data_ws_order_modified(data_order),
@@ -57,7 +56,7 @@ class WSMarketplaceAtrucks:
             'truck_requirements': cls._convert_data_ws_order_truck_requirements(data_order),
             'routepoints': cls._convert_data_ws_order_routepoints(data_order),
             'currency': data_order.get('currency'),
-            'price': cls._value_to_float(data_order.get('price')),
+            'price': cls._convert_data_ws_order_price(data_order),
             'rate_vat': cls._convert_data_ws_order_rate_vat(data_order)}
 
     @classmethod
@@ -175,6 +174,18 @@ class WSMarketplaceAtrucks:
             message = 'The "route" property is missing in the received data'
             raise RequestAborted(message)
         return result
+
+    @classmethod
+    def _convert_data_ws_order_price(cls, data_order: dict) -> float:
+        data_order_price = cls._value_to_float(data_order.get('price', ''))
+        data_order_start_price = cls._value_to_float(data_order.get('start_price', ''))
+        if data_order_price:
+            return data_order_price
+        elif data_order_start_price:
+            return data_order_start_price
+        else:
+            message = 'The "price, start_price" propertys is missing or incorrectly filled in the received data'
+            raise RequestAborted(message)
 
     @classmethod
     def _convert_data_ws_order_rate_vat(cls, data_order: dict) -> str:
