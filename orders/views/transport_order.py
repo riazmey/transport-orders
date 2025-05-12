@@ -14,6 +14,7 @@ from django.views.decorators.vary import vary_on_cookie
 from django.core.cache import cache
 from django.db import transaction
 
+import orders
 from orders.models import Marketplace
 from orders.models import TransportOrder
 from django.contrib.auth.models import User
@@ -33,12 +34,6 @@ def handler_serialize_transport_orders(data: list[SubscriptionOrder], processed_
     for subscription_order in data:
         orders.append(subscription_order.order)
     processed_data.append(SerializerTransportOrder(orders, many=True).data)
-
-def handler_delete_transport_orders(data: list[SubscriptionOrder], processed_data: list):
-    for subscription_order in data:
-        SubscriptionOrder.objects.filter(
-            subscription = subscription_order.subscription,
-            order = subscription_order.order).delete()
 
 class TransportOrderAPIView(APIView):
 
@@ -77,7 +72,7 @@ class TransportOrdersAPIView(APIView):
             market.ws.orders_import()
         return Response(self._get_serialized_data(market, request))
 
-    #@transaction.atomic
+    @transaction.atomic
     def _get_serialized_data(self, market: Marketplace, request: Request) -> list[dict]:
         key_cache = f'TransportOrdersAPIView._get_serialize_data(market={market.pk})'
         result = cache.get(key_cache)
@@ -94,8 +89,9 @@ class TransportOrdersAPIView(APIView):
                     data = queryset,
                     handler = handler_serialize_transport_orders).processing()
                 if result:
-                    MultithreadedDataProcessing(
-                        data = queryset,
-                        handler = handler_delete_transport_orders).processing()
+                    subscription_order_id = []
+                    for subscription_order in queryset:
+                        subscription_order_id.append(subscription_order.pk)
+                    SubscriptionOrder.objects.filter(pk__in = subscription_order_id).delete()
                 cache.set(key_cache, result, 60 * 60 * 2)
         return result
