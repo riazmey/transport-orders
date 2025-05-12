@@ -28,10 +28,17 @@ from subscriptions.models import SubscriptionOrder
 from multithreading import MultithreadedDataProcessing
 
 
-def handler_serialize_transport_orders(data: list, processed_data: list):
-    result = SerializerTransportOrder(data, many=True).data
-    processed_data.append(result)
+def handler_serialize_transport_orders(data: list[SubscriptionOrder], processed_data: list):
+    orders = []
+    for subscription_order in data:
+        orders.append(subscription_order.order)
+    processed_data.append(SerializerTransportOrder(orders, many=True).data)
 
+def handler_delete_transport_orders(data: list[SubscriptionOrder], processed_data: list):
+    for subscription_order in data:
+        SubscriptionOrder.objects.filter(
+            subscription = subscription_order.subscription,
+            order = subscription_order.order).delete()
 
 class TransportOrderAPIView(APIView):
 
@@ -70,25 +77,25 @@ class TransportOrdersAPIView(APIView):
             market.ws.orders_import()
         return Response(self._get_serialized_data(market, request))
 
-    @transaction.atomic
+    #@transaction.atomic
     def _get_serialized_data(self, market: Marketplace, request: Request) -> list[dict]:
         key_cache = f'TransportOrdersAPIView._get_serialize_data(market={market.pk})'
         result = cache.get(key_cache)
         if not result:
             result = []
-            queryset = []
+            queryset = None
             user_id = AccessToken(request.auth.token)['user_id']
             user = User.objects.get(id=user_id)
             if Subscription.objects.filter(user=user, model='TransportOrder').exists():
                 subscription = Subscription.objects.get(user=user, model='TransportOrder')
-                subscription_orders = SubscriptionOrder.objects.filter(subscription=subscription)
-                for subscription_order in subscription_orders:
-                    queryset.append(subscription_order.order)
+                queryset = SubscriptionOrder.objects.filter(subscription=subscription)
             if queryset:
                 result = MultithreadedDataProcessing(
-                    handler = handler_serialize_transport_orders,
-                    data = queryset).processing()
+                    data = queryset,
+                    handler = handler_serialize_transport_orders).processing()
                 if result:
-                    SubscriptionOrder.objects.filter(subscription=subscription).delete()
+                    MultithreadedDataProcessing(
+                        data = queryset,
+                        handler = handler_delete_transport_orders).processing()
                 cache.set(key_cache, result, 60 * 60 * 2)
         return result

@@ -1,8 +1,7 @@
-
 import multiprocessing
 import math
 
-from typing import Callable, List
+from typing import Callable
 from threading import Thread
 
 
