@@ -14,6 +14,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 import environ
+
+from datetime import timedelta
 from pathlib import Path
 from django.core.management.utils import get_random_secret_key
 
@@ -96,7 +98,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'orders.apps.OrdersConfig',
+    'subscriptions.apps.SubscriptionsConfig',
     'rest_framework',
+    'rest_framework.authtoken',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 MIDDLEWARE = [
@@ -175,7 +181,21 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDER_CLASSES': [
         'rest_framework.renders.JSONRenderer',
         'rest_framework.renders.BrowsableAPIRenderer',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.BasicAuthentication'
     ]
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=3),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'SIGNING_KEY': 'complexsigningkey',  # generate a key and replace me
+    'ALGORITHM': 'HS512',
 }
 
 CACHES = {

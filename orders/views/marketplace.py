@@ -1,12 +1,19 @@
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import IsAuthenticated
+
 from orders.models import Marketplace
 from orders.serializers import SerializerMarketplace
 from orders.serializers import SerializerMarketplaceAPIViewParams
 
 
 class MarketplaceAPIView(APIView):
+
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
 
     def get(self, request) -> dict:
 

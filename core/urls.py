@@ -18,13 +18,20 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from orders.views import MarketplaceAPIView
-from orders.views import TransportOrdersAPIView
-from orders.views import TransportOrderAPIView
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView)
+
+from orders.views import (
+    MarketplaceAPIView,
+    TransportOrdersAPIView,
+    TransportOrderAPIView)
 
 
 urlpatterns = [
     path("manage/", admin.site.urls),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/v1/marketplace/', MarketplaceAPIView.as_view()),
     path('api/v1/orders/', TransportOrdersAPIView.as_view()),
     path('api/v1/order/', TransportOrderAPIView.as_view())]

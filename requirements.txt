@@ -2,5 +2,6 @@ python-dateutil
 django
 psycopg2-binary
 djangorestframework
+djangorestframework-simplejwt
 django-environ
 requests

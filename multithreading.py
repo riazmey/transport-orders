@@ -13,7 +13,7 @@ class MultithreadedDataProcessing():
             number_threads = threads
         else:
             number_threads = self._quantify_threads()
-        self.queue = multiprocessing.Queue()
+        self.processed_data = []
         self.threads = self._initialize_threads(handler, data, number_threads)
 
     def processing(self) -> list:
@@ -22,8 +22,8 @@ class MultithreadedDataProcessing():
             thread.start()
         for thread in self.threads:
             thread.join()
-        while not self.queue.empty():
-            result += self.queue.get()
+        for data in self.processed_data:
+            result += data
         return result
 
     def _quantify_threads(self):
@@ -62,12 +62,12 @@ class MultithreadedDataProcessing():
             if (i // items_per_thread) == (i / items_per_thread) or i == num_items + 1:
                 result.append(Thread(
                     target=handler,
-                    args=(data_thread, self.queue)))
+                    args=(data_thread, self.processed_data)))
                 data_thread = None
         
         if data_thread:
             result.append(Thread(
                 target=handler,
-                args=(data_thread, self.queue)))
+                args=(data_thread, self.processed_data)))
         
         return result
