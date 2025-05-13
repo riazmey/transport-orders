@@ -143,7 +143,7 @@ class WSMarketplaceAtrucks:
                 'volume_unit': '113',
                 'refrigeration': refrigeration,
                 'temperature': temperature,
-                'comment': truck.get('carrying_description', '')[0:1024]}
+                'comment': cls._value_to_str(truck.get('carrying_description', ''))[0:1024]}
         else:
             message = 'The "truck" property is missing or incorrectly filled in the received data'
             raise RequestAborted(message)
