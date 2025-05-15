@@ -102,7 +102,7 @@ if use_vars_env:
             },
             'file': {
                 'class': 'loguru._handler._AsyncFileHandler',
-                'filename': getenv('DJANGO_LOGGING_DIR', f'{BASE_DIR}/log'),
+                'filename': getenv('DJANGO_LOGGING_FILE', f'{BASE_DIR}'),
                 'level': 'DEBUG',
             },
         },
