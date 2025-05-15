@@ -2,7 +2,6 @@
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.views import APIView
-from rest_framework import serializers
 from rest_framework_simplejwt.tokens import AccessToken
 
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -14,7 +13,6 @@ from django.views.decorators.vary import vary_on_cookie
 from django.core.cache import cache
 from django.db import transaction
 
-import orders
 from orders.models import Marketplace
 from orders.models import TransportOrder
 from django.contrib.auth.models import User

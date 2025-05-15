@@ -1,13 +1,14 @@
 
 import json
 import requests
-from decimal import Decimal
 from datetime import datetime
 from dateutil import parser
 from dateutil import tz
 from typing import Any, Dict, Tuple
 from django.core.exceptions import RequestAborted
 
+import logging
+logger = logging.getLogger(__name__)
 
 class WSMarketplaceAtrucks:
 
@@ -41,9 +42,13 @@ class WSMarketplaceAtrucks:
             return data, True
         
         except requests.RequestException as e:
-            return str(e), False
+            message = f'API request failed: {str(e)}'
+            logger.error(message)
+            return message, False
         except json.JSONDecodeError as e:
-            return f"Error parsing JSON: {e}", False
+            message = f'Error parsing JSON: {str(e)}'
+            logger.error(message)
+            return message, False
 
     @classmethod
     def _convert_data_ws_order(cls, data_order: dict) -> dict:
@@ -68,7 +73,9 @@ class WSMarketplaceAtrucks:
                 'external_id': order_id,
                 'external_code': order_human_name}
         else:
-            message = 'The received data is missing the "order_id" property'
+            message = f'_convert_data_ws_order_external_id(data_order={data_order}):' + \
+                ' The received data is missing the "order_id" property'
+            logger.error(message)
             raise RequestAborted(message)
 
     @classmethod
@@ -78,7 +85,9 @@ class WSMarketplaceAtrucks:
         if status_code:
             return status_code
         else:
-            message = f'It was not possible to compare the received order status "{status}"'
+            message = f'_convert_data_ws_order_status_code(data_order={data_order}):' + \
+                f'It was not possible to compare the received order status "{status}"'
+            logger.error(message)
             raise RequestAborted(message)
 
     @classmethod
@@ -87,7 +96,9 @@ class WSMarketplaceAtrucks:
         if modification_timestamp:
             return datetime.fromtimestamp(modification_timestamp).astimezone(tz.tzutc())
         else:
-            message = 'The received data is missing the "modification_timestamp" property'
+            message = f'_convert_data_ws_order_modified(data_order={data_order}):' + \
+                'The received data is missing the "modification_timestamp" property'
+            logger.error(message)
             raise RequestAborted(message)
 
     @classmethod
@@ -100,7 +111,9 @@ class WSMarketplaceAtrucks:
                 'name': cls._value_to_str(customer_company.get('name', ''))[0:255],
                 'name_full': cls._value_to_str(customer_company.get('requisite_name', ''))[0:255]}
         else:
-            message = 'The "customer_company" property is missing or incorrectly filled in the received data'
+            message = f'_convert_data_ws_order_counterparty(data_order={data_order}):' + \
+                'The "customer_company" property is missing or incorrectly filled in the received data'
+            logger.error(message)
             raise RequestAborted(message)
 
 
@@ -117,7 +130,9 @@ class WSMarketplaceAtrucks:
                 'volume': cls._value_to_float(cargo.get('volume')),
                 'volume_unit': '113'})
         else:
-            message = 'The "cargo" property is missing or incorrectly filled in the received data'
+            message = f'_convert_data_ws_order_cargo(data_order={data_order}):' + \
+                'The "cargo" property is missing or incorrectly filled in the received data'
+            logger.error(message)
             raise RequestAborted(message)
         return result
 
@@ -145,7 +160,9 @@ class WSMarketplaceAtrucks:
                 'temperature': temperature,
                 'comment': cls._value_to_str(truck.get('carrying_description', ''))[0:1024]}
         else:
-            message = 'The "truck" property is missing or incorrectly filled in the received data'
+            message = f'_convert_data_ws_order_truck_requirements(data_order={data_order}):' + \
+                'The "truck" property is missing or incorrectly filled in the received data'
+            logger.error(message)
             raise RequestAborted(message)
 
     @classmethod
@@ -167,11 +184,15 @@ class WSMarketplaceAtrucks:
                         'contact_person': cls._value_to_str(data_waypoint.get('contact_person', ''))[0:255],
                         'comment': cls._value_to_str(data_waypoint.get('comment', ''))[0:1024]})
             else:
-                message = 'The "route.waypoints" propertys is missing or incorrectly filled in the received data'
+                message = f'_convert_data_ws_order_routepoints(data_order={data_order}):' + \
+                    'The "route.waypoints" propertys is missing or incorrectly filled in the received data'
+                logger.error(message)
                 raise RequestAborted(message)
 
         else:
-            message = 'The "route" property is missing in the received data'
+            message = f'_convert_data_ws_order_routepoints(data_order={data_order}):' + \
+                'The "route" property is missing in the received data'
+            logger.error(message)
             raise RequestAborted(message)
         return result
 
@@ -199,7 +220,10 @@ class WSMarketplaceAtrucks:
         if rate_vat:
             return rate_vat
         else:
-            message = 'The "start_price_vat_type, current_price_vat_type" propertys is missing or incorrectly filled in the received data'
+            message = f'_convert_data_ws_order_rate_vat(data_order={data_order}):' + \
+                'The "start_price_vat_type, current_price_vat_type" propertys is missing or ' + \
+                'incorrectly filled in the received data'
+            logger.error(message)
             raise RequestAborted(message)
 
     @classmethod

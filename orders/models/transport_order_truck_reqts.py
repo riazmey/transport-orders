@@ -75,8 +75,9 @@ class TransportOrderTruckReqts(models.Model):
         repr_volume = ''
 
         ws = WSClassifiers()
-        weight_unit, success = ws.get_unit({'code_dec': self.weight_unit})
-        if success:
+        weight_units = ws.get_unit({'code_dec': self.weight_unit})
+        if weight_units:
+            weight_unit = weight_units[0]
             name = weight_unit.get('name')
             notation_national = weight_unit.get('notation_national')
             notation_international = weight_unit.get('notation_international')
@@ -90,8 +91,9 @@ class TransportOrderTruckReqts(models.Model):
                 repr_weight = f'{self.weight} {self.weight_unit}'
 
         if self.volume_unit:
-            volume_unit, success = ws.get_unit({'code_dec': self.volume_unit})
-            if success:
+            volume_units = ws.get_unit({'code_dec': self.volume_unit})
+            if volume_units:
+                volume_unit = volume_units[0]
                 name = volume_unit.get('name')
                 notation_national = volume_unit.get('notation_national')
                 notation_international = volume_unit.get('notation_international')

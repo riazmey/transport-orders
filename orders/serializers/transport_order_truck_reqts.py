@@ -16,16 +16,16 @@ class SerializerTransportOrderTruckReqts(serializers.ModelSerializer):
     volume_unit = serializers.SerializerMethodField()
 
     def get_weight_unit(self, data) -> dict:
-        data_unit, recieved = WSClassifiers().get_unit({'code_dec': data.weight_unit})
-        if recieved:
-            return data_unit
+        data_unit = WSClassifiers().get_unit({'code_dec': data.weight_unit})
+        if data_unit:
+            return data_unit[0]
         else:
             return {}
 
     def get_volume_unit(self, data) -> dict:
-        data_unit, recieved = WSClassifiers().get_unit({'code_dec': data.volume_unit})
-        if recieved:
-            return data_unit
+        data_unit = WSClassifiers().get_unit({'code_dec': data.volume_unit})
+        if data_unit:
+            return data_unit[0]
         else:
             return {}
 

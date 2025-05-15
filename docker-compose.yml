@@ -23,8 +23,14 @@ services:
     ports:
       - '${WEB_PORT}:${WEB_PORT}'
     volumes:
-      - source: /data/transport-orders-app/migrations
+      - source: /data/transport-orders-app/migrations-orders
         target: /app/transport-orders/orders/migrations
+        read_only: false
+        type: bind
+        bind:
+          create_host_path: true
+      - source: /data/transport-orders-app/migrations-subscriptions
+        target: /app/transport-orders/subscriptions/migrations
         read_only: false
         type: bind
         bind:

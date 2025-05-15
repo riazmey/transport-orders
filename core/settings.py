@@ -88,6 +88,54 @@ else:
         }
     }
 
+# Logging
+LOGGING_CONFIG = None
+
+if use_vars_env:
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'class': 'loguru._handler.StreamHandler',
+                'level': 'DEBUG',
+            },
+            'file': {
+                'class': 'loguru._handler._AsyncFileHandler',
+                'filename': getenv('DJANGO_LOGGING_DIR', f'{BASE_DIR}/log'),
+                'level': 'DEBUG',
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['console', 'file'],
+                'level': 'INFO',
+            },
+        }
+    }
+else:
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'class': 'loguru._handler.StreamHandler',
+                'level': 'DEBUG',
+            },
+            'file': {
+                'class': 'loguru._handler._AsyncFileHandler',
+                'filename': f'{BASE_DIR}/log',
+                'level': 'DEBUG',
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['console', 'file'],
+                'level': 'DEBUG',
+            },
+        }
+    }
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -200,7 +248,7 @@ SIMPLE_JWT = {
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'cache',
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
     }
-} # python manage.py createcachetable
+}

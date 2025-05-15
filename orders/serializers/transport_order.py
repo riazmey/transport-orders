@@ -27,16 +27,16 @@ class SerializerTransportOrder(serializers.ModelSerializer):
     rate_vat = serializers.SerializerMethodField()
 
     def get_currency(self, data) -> dict:
-        data_currency, recieved = WSClassifiers().get_currency({'code_str': data.currency})
-        if recieved:
-            return data_currency
+        data_currency = WSClassifiers().get_currency({'code_str': data.currency})
+        if data_currency:
+            return data_currency[0]
         else:
             return {}
 
     def get_rate_vat(self, data) -> dict:
-        data_rate_vat, recieved = WSClassifiers().get_rate_vat({'code_str': data.rate_vat})
-        if recieved:
-            return data_rate_vat
+        data_rate_vat = WSClassifiers().get_rate_vat({'code_str': data.rate_vat})
+        if data_rate_vat:
+            return data_rate_vat[0]
         else:
             return {}
 
