@@ -24,7 +24,15 @@ class WSMarketplaceAtrucks:
 
     def orders_mixin_get(self) -> Tuple[list[dict], bool]:
         result = []
-        data, received = self._request(requests.get, self.URNs.order)
+        data = []
+        data_available, received = self._request(method=requests.get,
+            urn=self.URNs.order, data='{"type": "available"}')
+        if received:
+            data += data_available
+        data_obtained, received = self._request(method=requests.get,
+            urn=self.URNs.order, data='{"type": "obtained"}')
+        if received:
+            data += data_obtained
         if received:
             for item_data in data:
                 data_order = item_data.get('order')
@@ -32,16 +40,16 @@ class WSMarketplaceAtrucks:
                 result.append(self._convert_data_ws_order(data_order, data_auction))
         return result, received
    
-    def _request(self, method: requests.Request, urn: str, params: Dict = None) -> Tuple[Any, bool]:
+    def _request(self, method: requests.Request, urn: str, params: Dict = None, data: str = None) -> Tuple[Any, bool]:
         url = f'{self.url}{urn}'
         headers = self.base_headers.copy()
         
         try:
-            response = method(url, headers=headers, params=params)
+            response = method(url, headers=headers, params=params, data=data)
             response.raise_for_status()
             
-            data = response.json()
-            return data, True
+            data_recieved = response.json()
+            return data_recieved, True
         
         except requests.RequestException as e:
             message = f'API request failed: {str(e)}'

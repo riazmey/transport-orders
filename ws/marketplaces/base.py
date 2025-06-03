@@ -46,10 +46,16 @@ class WSMarketplaceBase:
 
     def _orders_set_status_excluded(self, pks: list) -> list[TransportOrder]:
         result = []
+        statuses_pk_available = [
+            EnumTransportOrderStatus.objects.get(code_str='draft').pk,
+            EnumTransportOrderStatus.objects.get(code_str='auction').pk]
         status_closed = EnumTransportOrderStatus.objects.get(code_str='closed')
-        orders_excluded = TransportOrder.objects.exclude(status__pk=status_closed.pk).exclude(pk__in=pks)
+        orders_excluded = TransportOrder.objects.\
+            filter(status__pk__in=statuses_pk_available).\
+            exclude(status__pk=status_closed.pk).\
+            exclude(pk__in=pks)
         for order in orders_excluded:
-            TransportOrder.objects.filter(pk=order.pk).update(status = status_closed)
+            TransportOrder.objects.filter(pk=order.pk).update(status=status_closed)
             self._add_order_to_subscriptions(order)
         return result
 
