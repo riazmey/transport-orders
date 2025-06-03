@@ -27,7 +27,9 @@ class WSMarketplaceAtrucks:
         data, received = self._request(requests.get, self.URNs.order)
         if received:
             for item_data in data:
-                result.append(self._convert_data_ws_order(item_data.get('order')))
+                data_order = item_data.get('order')
+                data_auction = item_data.get('auction_status')
+                result.append(self._convert_data_ws_order(data_order, data_auction))
         return result, received
    
     def _request(self, method: requests.Request, urn: str, params: Dict = None) -> Tuple[Any, bool]:
@@ -51,7 +53,7 @@ class WSMarketplaceAtrucks:
             return message, False
 
     @classmethod
-    def _convert_data_ws_order(cls, data_order: dict) -> dict:
+    def _convert_data_ws_order(cls, data_order: dict, data_auction: dict = None) -> dict:
         return {
             'external_id': cls._convert_data_ws_order_external_id(data_order),
             'modified': cls._convert_data_ws_order_modified(data_order),
@@ -61,7 +63,7 @@ class WSMarketplaceAtrucks:
             'truck_requirements': cls._convert_data_ws_order_truck_requirements(data_order),
             'routepoints': cls._convert_data_ws_order_routepoints(data_order),
             'currency': data_order.get('currency'),
-            'price': cls._convert_data_ws_order_price(data_order),
+            'price': cls._convert_data_ws_order_price(data_order, data_auction),
             'rate_vat': cls._convert_data_ws_order_rate_vat(data_order)}
 
     @classmethod
@@ -197,13 +199,19 @@ class WSMarketplaceAtrucks:
         return result
 
     @classmethod
-    def _convert_data_ws_order_price(cls, data_order: dict) -> float:
-        data_order_price = cls._value_to_float(data_order.get('price', ''))
-        data_order_start_price = cls._value_to_float(data_order.get('start_price', ''))
-        if data_order_price:
-            return data_order_price
-        elif data_order_start_price:
-            return data_order_start_price
+    def _convert_data_ws_order_price(cls, data_order: dict, data_auction: dict = None) -> float:
+        price = cls._value_to_float(data_order.get('price', ''))
+        start_price = cls._value_to_float(data_order.get('start_price', ''))
+        current_price = None
+        if data_auction:
+            current_price = cls._value_to_float(data_auction.get('current_price', ''))
+        
+        if current_price:
+            return current_price
+        elif price:
+            return price
+        elif start_price:
+            return start_price
         else:
             return 0.0
 

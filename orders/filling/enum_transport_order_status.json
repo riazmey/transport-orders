@@ -3,5 +3,6 @@
 	{"code_str": "auction", "repr": "Аукцион"},
 	{"code_str": "waiting_start", "repr": "Ожидание начала исполнения"},
 	{"code_str": "in_progress", "repr": "В работе"},
-	{"code_str": "completed", "repr": "Выполнен"}
+	{"code_str": "completed", "repr": "Выполнен"},
+	{"code_str": "closed", "repr": "Закрыт (неизвестная причина)"}
 ]

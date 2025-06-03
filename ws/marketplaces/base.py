@@ -32,12 +32,26 @@ class WSMarketplaceBase:
         result = []
         data, success = self.orders_mixin_get()
         if success:
+            pks = []
             for order_data in data:
-                result.append(self._order_update_or_create(order_data))
+                order_current = self._order_update_or_create(order_data)
+                pks.append(order_current.pk)
+                result.append(order_current)
+            if pks:
+                result += self._orders_set_status_excluded(pks)
         return result, success
 
     def orders_mixin_get(self) -> Tuple[list[dict], bool]:
         return [], False
+
+    def _orders_set_status_excluded(self, pks: list) -> list[TransportOrder]:
+        result = []
+        status_closed = EnumTransportOrderStatus.objects.get(code_str='closed')
+        orders_excluded = TransportOrder.objects.exclude(status__pk=status_closed.pk).exclude(pk__in=pks)
+        for order in orders_excluded:
+            TransportOrder.objects.filter(pk=order.pk).update(status = status_closed)
+            self._add_order_to_subscriptions(order)
+        return result
 
     def _order_update_or_create(self, order_data: dict) -> TransportOrder:
         order_changed = False
